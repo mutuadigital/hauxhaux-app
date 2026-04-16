@@ -1,0 +1,729 @@
+// This is your Prisma schema file
+// https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================
+// AUTH
+// =============================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          Role      @default(PARTNER)
+  parceiroId    String?
+  ativo         Boolean   @default(true)
+  ultimoLoginEm DateTime?
+  criadoEm      DateTime  @default(now())
+  atualizadoEm  DateTime  @updatedAt
+
+  parceiro Parceiro? @relation(fields: [parceiroId], references: [id])
+  accounts Account[]
+  sessions Session[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+enum Role {
+  ADMIN
+  PARTNER
+}
+
+// =============================================
+// CADASTROS MESTRES
+// =============================================
+
+model Categoria {
+  id           String        @id @default(cuid())
+  tipo         TipoCategoria
+  nome         String
+  descricao    String?
+  ativo        Boolean       @default(true)
+  criadoEm     DateTime      @default(now())
+  atualizadoEm DateTime      @updatedAt
+
+  produtos Produto[]
+  insumos  Insumo[]
+
+  @@map("categorias")
+}
+
+enum TipoCategoria {
+  PRODUTO
+  INSUMO
+  PARCEIRO
+  MOVIMENTO
+}
+
+model Produto {
+  id            String   @id @default(cuid())
+  codigo        String   @unique
+  nome          String
+  categoriaId   String?
+  unidadeMedida String
+  precoPadrao   Decimal  @db.Decimal(10, 2)
+  custoRef      Decimal? @db.Decimal(10, 2)
+  estoqueMinimo Decimal  @default(0) @db.Decimal(10, 3)
+  ativo         Boolean  @default(true)
+  observacoes   String?
+  criadoEm      DateTime @default(now())
+  atualizadoEm  DateTime @updatedAt
+
+  categoria             Categoria?                @relation(fields: [categoriaId], references: [id])
+  composicoes           ComposicaoProduto[]
+  estoque               EstoqueProduto?
+  estoqueConsignado     EstoqueConsignado[]
+  movimentosProduto     MovimentoEstoqueProduto[]
+  remessasItens         RemessaConsignacaoItem[]
+  devolucoesItens       DevolucaoConsignacaoItem[]
+  declaracoesItens      DeclaracaoConsumoItem[]
+  fechamentosItens      FechamentoItem[]
+  solicitacoesItens     SolicitacaoReposicaoItem[]
+  producoes             Producao[]
+  vendasDiretasItens    VendaDiretaItem[]
+
+  @@map("produtos")
+}
+
+model Insumo {
+  id            String   @id @default(cuid())
+  codigo        String   @unique
+  nome          String
+  categoriaId   String?
+  unidadeMedida String
+  custoMedio    Decimal? @db.Decimal(10, 4)
+  estoqueMinimo Decimal  @default(0) @db.Decimal(10, 3)
+  ativo         Boolean  @default(true)
+  observacoes   String?
+  criadoEm      DateTime @default(now())
+  atualizadoEm  DateTime @updatedAt
+
+  categoria        Categoria?                @relation(fields: [categoriaId], references: [id])
+  estoque          EstoqueInsumo?
+  composicoesItens ComposicaoItem[]
+  movimentosInsumo MovimentoEstoqueInsumo[]
+  producaoConsumos ProducaoConsumoInsumo[]
+  comprasItens     CompraItem[]
+
+  @@map("insumos")
+}
+
+model Parceiro {
+  id                 String         @id @default(cuid())
+  nome               String
+  nomeFantasia       String?
+  documento          String?
+  contatoPrincipal   String?
+  telefone           String?
+  email              String?
+  endereco           String?
+  cidade             String?
+  estado             String?
+  observacoes        String?
+  status             StatusParceiro @default(ATIVO)
+  percentualComissao Decimal        @default(0) @db.Decimal(5, 2)
+  dataInicioParceria DateTime?
+  dataFimParceria    DateTime?
+  criadoEm           DateTime       @default(now())
+  atualizadoEm       DateTime       @updatedAt
+
+  usuarios          User[]
+  estoqueConsignado EstoqueConsignado[]
+  remessas          RemessaConsignacao[]
+  devolucoes        DevolucaoConsignacao[]
+  declaracoes       DeclaracaoConsumo[]
+  fechamentos       Fechamento[]
+  contasReceber     ContaReceber[]
+  solicitacoes      SolicitacaoReposicao[]
+  movimentosProduto MovimentoEstoqueProduto[]
+
+  @@map("parceiros")
+}
+
+enum StatusParceiro {
+  ATIVO
+  INATIVO
+  ENCERRADO
+}
+
+// =============================================
+// COMPOSIÇÃO TÉCNICA
+// =============================================
+
+model ComposicaoProduto {
+  id           String   @id @default(cuid())
+  produtoId    String
+  nomeVersao   String   @default("Padrão")
+  ativo        Boolean  @default(true)
+  observacoes  String?
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  produto Produto        @relation(fields: [produtoId], references: [id])
+  itens   ComposicaoItem[]
+
+  @@map("composicoes_produto")
+}
+
+model ComposicaoItem {
+  id             String   @id @default(cuid())
+  composicaoId   String
+  insumoId       String
+  quantidadeBase Decimal  @db.Decimal(10, 4)
+  unidadeMedida  String
+  fatorPerda     Decimal? @db.Decimal(5, 4)
+  ordem          Int      @default(0)
+  criadoEm       DateTime @default(now())
+  atualizadoEm   DateTime @updatedAt
+
+  composicao ComposicaoProduto @relation(fields: [composicaoId], references: [id], onDelete: Cascade)
+  insumo     Insumo            @relation(fields: [insumoId], references: [id])
+
+  @@map("composicoes_itens")
+}
+
+// =============================================
+// ESTOQUE
+// =============================================
+
+model EstoqueProduto {
+  id              String   @id @default(cuid())
+  produtoId       String   @unique
+  quantidadeAtual Decimal  @default(0) @db.Decimal(10, 3)
+  atualizadoEm    DateTime @updatedAt
+
+  produto Produto @relation(fields: [produtoId], references: [id])
+
+  @@map("estoque_produtos")
+}
+
+model EstoqueInsumo {
+  id              String   @id @default(cuid())
+  insumoId        String   @unique
+  quantidadeAtual Decimal  @default(0) @db.Decimal(10, 3)
+  atualizadoEm    DateTime @updatedAt
+
+  insumo Insumo @relation(fields: [insumoId], references: [id])
+
+  @@map("estoque_insumos")
+}
+
+model EstoqueConsignado {
+  id              String   @id @default(cuid())
+  parceiroId      String
+  produtoId       String
+  quantidadeAtual Decimal  @default(0) @db.Decimal(10, 3)
+  atualizadoEm    DateTime @updatedAt
+
+  parceiro Parceiro @relation(fields: [parceiroId], references: [id])
+  produto  Produto  @relation(fields: [produtoId], references: [id])
+
+  @@unique([parceiroId, produtoId])
+  @@map("estoque_consignado")
+}
+
+model MovimentoEstoqueProduto {
+  id              String         @id @default(cuid())
+  produtoId       String
+  tipoMovimento   TipoMovProduto
+  origemTipo      String?
+  origemId        String?
+  parceiroId      String?
+  quantidade      Decimal        @db.Decimal(10, 3)
+  sinal           SinalMovimento
+  valorReferencia Decimal?       @db.Decimal(10, 2)
+  observacao      String?
+  criadoPor       String?
+  criadoEm        DateTime       @default(now())
+
+  produto  Produto   @relation(fields: [produtoId], references: [id])
+  parceiro Parceiro? @relation(fields: [parceiroId], references: [id])
+
+  @@index([produtoId, criadoEm])
+  @@index([parceiroId, criadoEm])
+  @@map("movimentos_estoque_produtos")
+}
+
+enum TipoMovProduto {
+  PRODUCAO_ENTRADA
+  CONSIGNACAO_SAIDA
+  DEVOLUCAO_ENTRADA
+  AJUSTE_ENTRADA
+  AJUSTE_SAIDA
+  PERDA_SAIDA
+  CONSUMO_INTERNO_SAIDA
+}
+
+model MovimentoEstoqueInsumo {
+  id            String         @id @default(cuid())
+  insumoId      String
+  tipoMovimento TipoMovInsumo
+  origemTipo    String?
+  origemId      String?
+  quantidade    Decimal        @db.Decimal(10, 4)
+  sinal         SinalMovimento
+  custoUnitario Decimal?       @db.Decimal(10, 4)
+  observacao    String?
+  criadoPor     String?
+  criadoEm      DateTime       @default(now())
+
+  insumo Insumo @relation(fields: [insumoId], references: [id])
+
+  @@index([insumoId, criadoEm])
+  @@map("movimentos_estoque_insumos")
+}
+
+enum TipoMovInsumo {
+  COMPRA_ENTRADA
+  PRODUCAO_SAIDA
+  AJUSTE_ENTRADA
+  AJUSTE_SAIDA
+  PERDA_SAIDA
+}
+
+enum SinalMovimento {
+  ENTRADA
+  SAIDA
+}
+
+// =============================================
+// PRODUÇÃO
+// =============================================
+
+model Producao {
+  id                  String         @id @default(cuid())
+  codigoLote          String         @unique
+  produtoId           String
+  quantidadePrevista  Decimal        @db.Decimal(10, 3)
+  quantidadeRealizada Decimal?       @db.Decimal(10, 3)
+  dataProducao        DateTime
+  status              StatusProducao @default(RASCUNHO)
+  observacoes         String?
+  criadoPor           String?
+  criadoEm            DateTime       @default(now())
+  atualizadoEm        DateTime       @updatedAt
+
+  produto        Produto                 @relation(fields: [produtoId], references: [id])
+  consumoInsumos ProducaoConsumoInsumo[]
+
+  @@index([produtoId, dataProducao])
+  @@map("producoes")
+}
+
+enum StatusProducao {
+  RASCUNHO
+  CONFIRMADA
+  CANCELADA
+}
+
+model ProducaoConsumoInsumo {
+  id                 String   @id @default(cuid())
+  producaoId         String
+  insumoId           String
+  quantidadePrevista Decimal  @db.Decimal(10, 4)
+  quantidadeReal     Decimal? @db.Decimal(10, 4)
+  observacao         String?
+
+  producao Producao @relation(fields: [producaoId], references: [id], onDelete: Cascade)
+  insumo   Insumo   @relation(fields: [insumoId], references: [id])
+
+  @@map("producoes_consumo_insumos")
+}
+
+// =============================================
+// COMPRAS
+// =============================================
+
+model Compra {
+  id             String   @id @default(cuid())
+  fornecedorNome String
+  dataCompra     DateTime
+  documentoRef   String?
+  valorTotal     Decimal  @db.Decimal(10, 2)
+  observacoes    String?
+  criadoPor      String?
+  criadoEm       DateTime @default(now())
+  atualizadoEm   DateTime @updatedAt
+
+  itens CompraItem[]
+
+  @@index([dataCompra])
+  @@map("compras")
+}
+
+model CompraItem {
+  id         String  @id @default(cuid())
+  compraId   String
+  insumoId   String
+  quantidade Decimal @db.Decimal(10, 4)
+  valorUnit  Decimal @db.Decimal(10, 4)
+  valorTotal Decimal @db.Decimal(10, 2)
+
+  compra Compra @relation(fields: [compraId], references: [id], onDelete: Cascade)
+  insumo Insumo @relation(fields: [insumoId], references: [id])
+
+  @@map("compras_itens")
+}
+
+// =============================================
+// CONSIGNAÇÃO
+// =============================================
+
+model RemessaConsignacao {
+  id           String        @id @default(cuid())
+  parceiroId   String
+  dataEnvio    DateTime
+  status       StatusRemessa @default(RASCUNHO)
+  observacoes  String?
+  criadoPor    String?
+  criadoEm     DateTime      @default(now())
+  atualizadoEm DateTime      @updatedAt
+
+  parceiro Parceiro                 @relation(fields: [parceiroId], references: [id])
+  itens    RemessaConsignacaoItem[]
+
+  @@index([parceiroId, dataEnvio])
+  @@map("remessas_consignacao")
+}
+
+enum StatusRemessa {
+  RASCUNHO
+  CONFIRMADA
+  CANCELADA
+}
+
+model RemessaConsignacaoItem {
+  id              String  @id @default(cuid())
+  remessaId       String
+  produtoId       String
+  quantidade      Decimal @db.Decimal(10, 3)
+  valorReferencia Decimal? @db.Decimal(10, 2)
+
+  remessa RemessaConsignacao @relation(fields: [remessaId], references: [id], onDelete: Cascade)
+  produto Produto            @relation(fields: [produtoId], references: [id])
+
+  @@map("remessas_consignacao_itens")
+}
+
+model DevolucaoConsignacao {
+  id            String        @id @default(cuid())
+  parceiroId    String
+  dataDevolucao DateTime
+  status        StatusRemessa @default(RASCUNHO)
+  observacoes   String?
+  criadoPor     String?
+  criadoEm      DateTime      @default(now())
+  atualizadoEm  DateTime      @updatedAt
+
+  parceiro Parceiro                   @relation(fields: [parceiroId], references: [id])
+  itens    DevolucaoConsignacaoItem[]
+
+  @@index([parceiroId, dataDevolucao])
+  @@map("devolucoes_consignacao")
+}
+
+model DevolucaoConsignacaoItem {
+  id                 String  @id @default(cuid())
+  devolucaoId        String
+  produtoId          String
+  quantidade         Decimal @db.Decimal(10, 3)
+  observacaoCondicao String?
+
+  devolucao DevolucaoConsignacao @relation(fields: [devolucaoId], references: [id], onDelete: Cascade)
+  produto   Produto              @relation(fields: [produtoId], references: [id])
+
+  @@map("devolucoes_consignacao_itens")
+}
+
+// =============================================
+// DECLARAÇÃO DE CONSUMO (Portal Parceiro)
+// =============================================
+
+model DeclaracaoConsumo {
+  id             String           @id @default(cuid())
+  parceiroId     String
+  competenciaAno Int
+  competenciaMes Int
+  status         StatusDeclaracao @default(RASCUNHO)
+  enviadoPor     String?
+  enviadoEm      DateTime?
+  observacoes    String?
+  criadoEm       DateTime         @default(now())
+  atualizadoEm   DateTime         @updatedAt
+
+  parceiro Parceiro                @relation(fields: [parceiroId], references: [id])
+  itens    DeclaracaoConsumoItem[]
+
+  @@unique([parceiroId, competenciaAno, competenciaMes])
+  @@index([parceiroId, competenciaAno, competenciaMes])
+  @@map("declaracoes_consumo")
+}
+
+enum StatusDeclaracao {
+  RASCUNHO
+  ENVIADO
+  VALIDADO
+  INCORPORADO_NO_FECHAMENTO
+}
+
+model DeclaracaoConsumoItem {
+  id                  String  @id @default(cuid())
+  declaracaoId        String
+  produtoId           String
+  quantidadeConsumida Decimal @db.Decimal(10, 3)
+  valorUnitarioRef    Decimal? @db.Decimal(10, 2)
+  observacao          String?
+
+  declaracao DeclaracaoConsumo @relation(fields: [declaracaoId], references: [id], onDelete: Cascade)
+  produto    Produto           @relation(fields: [produtoId], references: [id])
+
+  @@map("declaracoes_consumo_itens")
+}
+
+// =============================================
+// FECHAMENTO MENSAL
+// =============================================
+
+model Fechamento {
+  id              String           @id @default(cuid())
+  parceiroId      String
+  competenciaAno  Int
+  competenciaMes  Int
+  dataAbertura    DateTime         @default(now())
+  dataFechamento  DateTime?
+  status          StatusFechamento @default(ABERTO)
+  totalQuantidade Decimal?         @db.Decimal(10, 3)
+  totalValor      Decimal?         @db.Decimal(10, 2)
+  observacoes     String?
+  criadoPor       String?
+  atualizadoPor   String?
+  criadoEm        DateTime         @default(now())
+  atualizadoEm    DateTime         @updatedAt
+
+  parceiro      Parceiro       @relation(fields: [parceiroId], references: [id])
+  itens         FechamentoItem[]
+  contasReceber ContaReceber[]
+
+  @@unique([parceiroId, competenciaAno, competenciaMes])
+  @@index([parceiroId, competenciaAno, competenciaMes])
+  @@map("fechamentos")
+}
+
+enum StatusFechamento {
+  ABERTO
+  EM_VALIDACAO
+  FECHADO
+  REABERTO
+  CANCELADO
+}
+
+model FechamentoItem {
+  id                  String  @id @default(cuid())
+  fechamentoId        String
+  produtoId           String
+  saldoInicial        Decimal @db.Decimal(10, 3)
+  quantidadeEnviada   Decimal @default(0) @db.Decimal(10, 3)
+  quantidadeDevolvida Decimal @default(0) @db.Decimal(10, 3)
+  quantidadeConsumida Decimal @default(0) @db.Decimal(10, 3)
+  saldoFinal          Decimal @db.Decimal(10, 3)
+  valorUnitario       Decimal @db.Decimal(10, 2)
+  valorTotal          Decimal @db.Decimal(10, 2)
+  valorComissao       Decimal @default(0) @db.Decimal(10, 2)
+  valorRepasse        Decimal @default(0) @db.Decimal(10, 2)
+
+  fechamento Fechamento @relation(fields: [fechamentoId], references: [id], onDelete: Cascade)
+  produto    Produto    @relation(fields: [produtoId], references: [id])
+
+  @@map("fechamentos_itens")
+}
+
+// =============================================
+// FINANCEIRO INTERNO
+// =============================================
+
+model ContaReceber {
+  id             String      @id @default(cuid())
+  fechamentoId   String?
+  vendaDiretaId  String?
+  parceiroId     String?
+  descricao      String
+  dataEmissao    DateTime    @default(now())
+  dataVencimento DateTime?
+  valorTotal     Decimal     @db.Decimal(10, 2)
+  valorComissao  Decimal     @default(0) @db.Decimal(10, 2)
+  valorRepasse   Decimal     @db.Decimal(10, 2)
+  valorRecebido  Decimal     @default(0) @db.Decimal(10, 2)
+  saldoAberto    Decimal     @db.Decimal(10, 2)
+  status         StatusConta @default(EM_ABERTO)
+  observacoes    String?
+  criadoEm       DateTime    @default(now())
+  atualizadoEm   DateTime    @updatedAt
+
+  fechamento   Fechamento?  @relation(fields: [fechamentoId], references: [id])
+  vendaDireta  VendaDireta? @relation(fields: [vendaDiretaId], references: [id])
+  parceiro     Parceiro?    @relation(fields: [parceiroId], references: [id])
+  recebimentos Recebimento[]
+
+  @@index([parceiroId, status])
+  @@map("contas_receber")
+}
+
+enum StatusConta {
+  EM_ABERTO
+  PARCIAL
+  RECEBIDO
+  VENCIDO
+  CANCELADO
+}
+
+model Recebimento {
+  id               String   @id @default(cuid())
+  contaReceiverId  String
+  dataRecebimento  DateTime
+  valorRecebido    Decimal  @db.Decimal(10, 2)
+  formaRecebimento String?
+  observacoes      String?
+  registradoPor    String?
+  criadoEm         DateTime @default(now())
+
+  contaReceber ContaReceber @relation(fields: [contaReceiverId], references: [id])
+
+  @@map("recebimentos")
+}
+
+// =============================================
+// VENDAS DIRETAS (clientes finais)
+// =============================================
+
+model VendaDireta {
+  id           String   @id @default(cuid())
+  dataVenda    DateTime @default(now())
+  clienteNome  String?
+  clienteDoc   String?
+  valorTotal   Decimal  @db.Decimal(10, 2)
+  observacoes  String?
+  criadoPor    String?
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  itens         VendaDiretaItem[]
+  contasReceber ContaReceber[]
+
+  @@map("vendas_diretas")
+}
+
+model VendaDiretaItem {
+  id         String  @id @default(cuid())
+  vendaId    String
+  produtoId  String
+  quantidade Decimal @db.Decimal(10, 2)
+  valorUnit  Decimal @db.Decimal(10, 2)
+  valorTotal Decimal @db.Decimal(10, 2)
+
+  venda   VendaDireta @relation(fields: [vendaId], references: [id], onDelete: Cascade)
+  produto Produto     @relation(fields: [produtoId], references: [id])
+
+  @@map("vendas_diretas_itens")
+}
+
+// =============================================
+// SOLICITAÇÃO DE REPOSIÇÃO
+// =============================================
+
+model SolicitacaoReposicao {
+  id           String            @id @default(cuid())
+  parceiroId   String
+  status       StatusSolicitacao @default(ABERTA)
+  observacoes  String?
+  criadoPor    String?
+  criadoEm     DateTime          @default(now())
+  atualizadoEm DateTime          @updatedAt
+
+  parceiro Parceiro                  @relation(fields: [parceiroId], references: [id])
+  itens    SolicitacaoReposicaoItem[]
+
+  @@map("solicitacoes_reposicao")
+}
+
+enum StatusSolicitacao {
+  ABERTA
+  EM_ANALISE
+  APROVADA
+  ATENDIDA
+  RECUSADA
+}
+
+model SolicitacaoReposicaoItem {
+  id                   String  @id @default(cuid())
+  solicitacaoId        String
+  produtoId            String
+  quantidadeSolicitada Decimal @db.Decimal(10, 3)
+  observacao           String?
+
+  solicitacao SolicitacaoReposicao @relation(fields: [solicitacaoId], references: [id], onDelete: Cascade)
+  produto     Produto              @relation(fields: [produtoId], references: [id])
+
+  @@map("solicitacoes_reposicao_itens")
+}
+
+// =============================================
+// AUDITORIA
+// =============================================
+
+model AuditoriaEvento {
+  id            String   @id @default(cuid())
+  entidade      String
+  entidadeId    String
+  acao          String
+  dadosAntes    Json?
+  dadosDepois   Json?
+  justificativa String?
+  usuarioId     String?
+  criadoEm      DateTime @default(now())
+
+  @@index([entidade, entidadeId])
+  @@index([usuarioId, criadoEm])
+  @@map("auditoria_eventos")
+}
