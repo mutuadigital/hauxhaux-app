@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual do Usuário - HAUXHAUX Sistema de Gestão</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: #2d2d2d;
+            background: #fff;
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        /* ========== CAPA ========== */
+        .cover {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 40%, #3d2e1f 100%);
+            color: #c9a84c;
+            text-align: center;
+            page-break-after: always;
+        }
+
+        .cover h1 {
+            font-size: 52px;
+            font-weight: 800;
+            letter-spacing: 8px;
+            margin-bottom: 10px;
+        }
+
+        .cover .subtitle {
+            font-size: 18px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            color: #e8d5a3;
+            margin-bottom: 60px;
+        }
+
+        .cover .doc-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+            border-top: 2px solid #c9a84c;
+            border-bottom: 2px solid #c9a84c;
+            padding: 20px 60px;
+            margin-bottom: 40px;
+        }
+
+        .cover .version {
+            font-size: 13px;
+            color: #888;
+            font-weight: 400;
+        }
+
+        /* ========== SUMÁRIO ========== */
+        .toc {
+            padding: 60px 80px;
+            page-break-after: always;
+        }
+
+        .toc h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a2e;
+            border-bottom: 3px solid #c9a84c;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        .toc ol {
+            list-style: none;
+            counter-reset: toc-counter;
+        }
+
+        .toc ol li {
+            counter-increment: toc-counter;
+            padding: 10px 0;
+            border-bottom: 1px dotted #ccc;
+            font-size: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .toc ol li::before {
+            content: counter(toc-counter) ".";
+            font-weight: 700;
+            color: #c9a84c;
+            margin-right: 12px;
+            min-width: 30px;
+        }
+
+        /* ========== SEÇÕES ========== */
+        .section {
+            padding: 40px 60px;
+            page-break-before: always;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #c9a84c;
+            padding-bottom: 12px;
+        }
+
+        .section-number {
+            background: #1a1a2e;
+            color: #c9a84c;
+            font-size: 22px;
+            font-weight: 800;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+
+        .section h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .section h3 {
+            font-size: 17px;
+            font-weight: 600;
+            color: #3d2e1f;
+            margin: 24px 0 10px;
+        }
+
+        .section p {
+            margin-bottom: 12px;
+            text-align: justify;
+        }
+
+        /* ========== SCREENSHOTS ========== */
+        .screenshot-container {
+            margin: 20px 0;
+            border: 2px solid #e0d5c0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .screenshot-container img {
+            width: 100%;
+            display: block;
+        }
+
+        .screenshot-caption {
+            background: #f5f0e8;
+            padding: 10px 16px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #666;
+            text-align: center;
+            font-style: italic;
+        }
+
+        /* ========== DICAS E ALERTAS ========== */
+        .tip {
+            background: #f0f7ee;
+            border-left: 4px solid #5a9e42;
+            padding: 14px 18px;
+            margin: 16px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+        }
+
+        .tip::before {
+            content: "💡 Dica: ";
+            font-weight: 700;
+            color: #5a9e42;
+        }
+
+        .warning {
+            background: #fef3e2;
+            border-left: 4px solid #e67e22;
+            padding: 14px 18px;
+            margin: 16px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+        }
+
+        .warning::before {
+            content: "⚠️ Atenção: ";
+            font-weight: 700;
+            color: #e67e22;
+        }
+
+        .info {
+            background: #eef4fb;
+            border-left: 4px solid #3498db;
+            padding: 14px 18px;
+            margin: 16px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+        }
+
+        .info::before {
+            content: "ℹ️ Info: ";
+            font-weight: 700;
+            color: #3498db;
+        }
+
+        /* ========== TABELAS ========== */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #1a1a2e;
+            color: #c9a84c;
+            padding: 10px 14px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #e0d5c0;
+        }
+
+        tr:nth-child(even) {
+            background: #faf6ef;
+        }
+
+        /* ========== LISTAS ========== */
+        .steps {
+            list-style: none;
+            counter-reset: step-counter;
+            margin: 12px 0;
+        }
+
+        .steps li {
+            counter-increment: step-counter;
+            padding: 8px 0 8px 40px;
+            position: relative;
+            margin-bottom: 4px;
+        }
+
+        .steps li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 6px;
+            background: #c9a84c;
+            color: #fff;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .field-list {
+            margin: 8px 0 16px;
+            padding-left: 20px;
+        }
+
+        .field-list li {
+            margin-bottom: 4px;
+        }
+
+        .field-list strong {
+            color: #1a1a2e;
+        }
+
+        /* ========== MENU LATERAL ========== */
+        .menu-ref {
+            background: #1a1a2e;
+            color: #e8d5a3;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-size: 13px;
+        }
+
+        .menu-ref h4 {
+            color: #c9a84c;
+            font-size: 14px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .menu-ref ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .menu-ref ul li {
+            padding: 4px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .menu-ref .menu-group {
+            color: #888;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 12px;
+            margin-bottom: 4px;
+            padding-left: 0;
+        }
+
+        /* PRINT */
+        @media print {
+            body {
+                font-size: 12px;
+            }
+
+            .section {
+                padding: 30px 40px;
+            }
+
+            .cover {
+                height: 100vh;
+            }
+
+            .screenshot-container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ===================== CAPA ===================== -->
+    <div class="cover">
+        <h1>HAUXHAUX</h1>
+        <div class="subtitle">SISTEMA DE GESTÃO</div>
+        <div class="doc-title">Manual do Usuário</div>
+        <div class="version">Versão 1.0 — Abril 2026</div>
+    </div>
+
+    <!-- ===================== SUMÁRIO ===================== -->
+    <div class="toc">
+        <h2>Sumário</h2>
+        <ol>
+            <li>Introdução ao Sistema</li>
+            <li>Acesso ao Sistema (Login)</li>
+            <li>Dashboard — Painel Principal</li>
+            <li>Cadastro de Produtos</li>
+            <li>Cadastro de Categorias</li>
+            <li>Cadastro de Insumos</li>
+            <li>Cadastro de Parceiros</li>
+            <li>Controle de Estoque</li>
+            <li>Registro de Produção</li>
+            <li>Registro de Compras</li>
+            <li>Remessas em Consignação</li>
+            <li>Devoluções de Consignação</li>
+            <li>Fechamentos de Consignação</li>
+            <li>Vendas Diretas</li>
+            <li>Contas a Receber (Financeiro)</li>
+            <li>Portal do Parceiro — Visão Geral</li>
+            <li>Portal do Parceiro — Registrar Venda</li>
+            <li>Portal do Parceiro — Declarar Consumo</li>
+            <li>Portal do Parceiro — Histórico</li>
+            <li>Fluxo Operacional Completo</li>
+        </ol>
+    </div>
+
+    <!-- ===================== 1. INTRODUÇÃO ===================== -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">1</div>
+            <h2>Introdução ao Sistema</h2>
+        </div>
+
+        <p>O <strong>HAUXHAUX Sistema de Gestão</strong> é uma plataforma completa para gerenciamento de produção,
+            estoque, consignação e financeiro da operação HAUXHAUX. O sistema permite controlar todo o ciclo de vida dos
+            produtos — desde a compra de insumos, passando pela produção, até a venda via parceiros de consignação ou
+            vendas diretas para clientes finais.</p>
+
+        <h3>Principais Módulos</h3>
+        <table>
+            <tr>
+                <th>Módulo</th>
+                <th>Função</th>
+            </tr>
+            <tr>
+                <td><strong>Cadastros</strong></td>
+                <td>Produtos, Insumos, Categorias e Parceiros</td>
+            </tr>
+            <tr>
+                <td><strong>Operação</strong></td>
+                <td>Compras de insumos, Produção, Estoque e Vendas Diretas</td>
+            </tr>
+            <tr>
+                <td><strong>Consignação</strong></td>
+                <td>Remessas para parceiros e Devoluções</td>
+            </tr>
+            <tr>
+                <td><strong>Financeiro</strong></td>
+                <td>Fechamentos mensais e Contas a Receber</td>
+            </tr>
+        </table>
+
+        <div class="menu-ref">
+            <h4>Menu de Navegação</h4>
+            <div class="menu-group">Principal</div>
+            <ul>
+                <li>📊 Dashboard</li>
+            </ul>
+            <div class="menu-group">Cadastros</div>
+            <ul>
+                <li>🧴 Produtos</li>
+                <li>🌿 Insumos</li>
+                <li>◆ Categorias</li>
+                <li>🤝 Parceiros</li>
+                <li>👤 Usuários</li>
+            </ul>
+            <div class="menu-group">Operação</div>
+            <ul>
+                <li>📦 Compras</li>
+                <li>🔬 Produção</li>
+                <li>🏪 Estoque</li>
+                <li>🛒 Vendas Diretas</li>
+            </ul>
+            <div class="menu-group">Consignação</div>
+            <ul>
+                <li>🚚 Remessas</li>
+                <li>📥 Devoluções</li>
+            </ul>
+            <div class="menu-group">Financeiro</div>
+            <ul>
+                <li>📋 Fechamentos</li>
+                <li>💰 Contas a Receber</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ===================== 2. LOGIN ===================== -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">2</div>
+            <h2>Acesso ao Sistema (Login)</h2>
+        </div>
+
+        <p>Para acessar o sistema, utilize o navegador de internet (Chrome, Firefox ou Edge) e acesse o endereço do
+            sistema. Você verá a tela de login abaixo:</p>
+
+        <div class="screenshot-container">
+            <img src="manual_01_login_1776393785602.png" alt="Tela de Login">
+            <div class="screenshot-caption">Figura 1 — Tela de Login do Sistema HAUXHAUX</div>
+        </div>
+
+        <h3>Como fazer login</h3>
+        <ol class="steps">
+            <li>Digite seu <strong>e-mail</strong> no campo "E-mail"</li>
+            <li>Digite sua <strong>senha</strong> no campo "Senha"</li>
+            <li>Clique no botão <strong>"Entrar"</strong></li>
+        </ol>
+
+        <div class="tip">Caso esqueça sua senha, entre em contato com o administrador do sistema para redefinição.</div>
+
+        <div class="warning">Nunca compartilhe suas credenciais de acesso com terceiros. Cada usuário possui um login
+            individual.</div>
+    </div>
+
+    <!-- ===================== 3. DASHBOARD ===================== -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">3</div>
+            <h2>Dashboard — Painel Principal</h2>
+        </div>
+
+        <p>O Dashboard é a tela inicial após o login. Ele apresenta uma <strong>visão geral da operação</strong> com
+            indicadores-chave, alertas e atalhos rápidos para as principais funcionalidades.</p>
+
+        <div class="screenshot-container">
+            <img src="manual_02_dashboard_1776393718583.png" alt="Dashboard">
+            <div class="screenshot-caption">Figura 2 — Dashboard com resumo geral da operação</div>
+        </div>
+
+        <h3>Cards de Resumo (topo)</h3>
+        <table>
+            <tr>
+                <th>Indicador</th>
+                <th>O que mostra</th>
+            </tr>
+            <tr>
+                <td><strong>Parceiros Ativos</strong></td>
+                <td>Quantidade de parceiros com produtos em consignação</td>
+            </tr>
+            <tr>
+                <td><strong>Produtos</strong></td>
+                <td>Total de produtos cadastrados no sistema</td>
+            </tr>
+            <tr>
+                <td><strong>Insumos</strong></td>
+                <td>Total de insumos cadastrados</td>
+            </tr>
+            <tr>
+                <td><strong>A Receber</strong></td>
+                <td>Valor total das contas a receber em aberto (R$)</td>
+            </tr>
+        </table>
+
+        <h3>Seções do Dashboard</h3>
+        <ul class="field-list">
+            <li><strong>⚠️ Estoque Baixo:</strong> Lista os produtos cujo saldo de estoque está <strong>abaixo do
+                    mínimo</strong> configurado. Valores em <span style="color:red">vermelho</span> indicam estoque
+                crítico</li>
+            <li><strong>🔬 Últimas Produções:</strong> Exibe os lotes de produção mais recentes com quantidade e status
+            </li>
+            <li><strong>🚚 Últimas Remessas:</strong> Mostra as remessas de consignação mais recentes enviadas aos
+                parceiros</li>
+        </ul>
+
+        <div class="tip">Clique em "Ver tudo" em qualquer seção para acessar a página completa com todos os registros.
+        </div>
+    </div>
+
+    <!-- ===================== 4. PRODUTOS ===================== -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">4</div>
+            <h2>Cadastro de Produtos</h2>
+        </div>
+
+        <p>A tela de Produtos permite cadastrar, editar e gerenciar todos os <strong>produtos acabados</strong> que
+            serão vendidos via consignação ou vendas diretas.</p>
+
+        <div class="screenshot-container">
+            <img src="manual_03_produtos_1776393734331.png" alt="Produtos">
+            <div class="screenshot-caption">Figura 3 — Lista de produtos cadastrados</div>
+        </div>
+
+        <h3>Informações da Tabela</h3>
+        <table>
+            <tr>
+                <th>Coluna</th>
+                <th>Descrição</th>
+            </tr>
+            <tr>
+                <td><strong>Código</strong></td>
+                <td>Código interno do produto (ex: PROD-002, 001)</td>
+            </tr>
+            <tr>
+                <td><strong>Nome</strong></td>
+                <td>Nome de identificação do produto</td>
+            </tr>
+            <tr>
+                <td><strong>Categoria</strong></td>
+                <td>Classificação do produto (ex: Rapé)</td>
+            </tr>
+            <tr>
+                <td><strong>Un.</strong></td>
+                <td>Unidade de medida (un, g, kg, ml, L)</td>
+            </tr>
+            <tr>
+                <td><strong>Preço</strong></td>
+                <td>Preço de venda sugerido do produto (R$)</td>
+            </tr>
+            <tr>
+                <td><strong>Estoque</strong></td>
+                <td>Saldo atual em estoque. <span style="color:red">Vermelho</span> = estoque baixo</td>
+            </tr>
+            <tr>
+                <td><strong>Ações</strong></td>
+                <td>Ícones para Editar ✏️, Composição 📋 e Excluir 🗑️</td>
+            </tr>
+        </table>
+
+        <h3>Como cadastrar um novo produto</h3>
+        <ol class="steps">
+            <li>Clique no botão <strong>"+ Novo Produto"</strong> (canto superior direito)</li>
+            <li>Preencha os campos: Nome, Código, Categoria, Unidade, Preço e Estoque Mínimo</li>
+            <li>Clique em <strong>"Salvar"</strong></li>
+        </ol>
+
+        <h3>Busca</h3>
+        <p>Use o campo <strong>"Buscar produto..."</strong> no topo da página para filtrar produtos por nome ou código.
+        </p>
+
+        <div class="info">O preço definido aqui é o <strong>valor padrão</strong>. Ao criar remessas ou vendas diretas,
+            é possível editar o preço unitário de venda.</div>
+    </div>
+
+    <!-- ===================== 5. CATEGORIAS ===================== -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">5</div>
+            <h2>Cadastro de Categorias</h2>
+        </div>
+
+        <p>As Categorias servem para <strong>organizar e classificar</strong> os produtos e insumos em grupos. Cada
+            categoria possui um tipo: <strong>PRODUTO</strong> ou <strong>INSUMO</strong>.</p>
+
+        <div class="screenshot-container">
+            <img src="manual_04_categorias_1776393764457.png" alt="Categorias">
+            <div class="screenshot-caption">Figura 4 — Gestão de categorias</div>
+        </div>
+
+        <h3>Como criar uma nova categoria</h3>
+        <ol class="steps">
+            <li>Clique no botão <strong>"+ Nova Categoria"</strong></li>
+            <li>Informe o <strong>Nome</strong> da categoria</li>
+            <li>Selecione o <strong>Tipo</strong>: PRODUTO ou INSUMO</li>
+            <li>Clique em <strong>"Salvar"</strong></li>
+        </ol>
+
+        <div class="tip">Crie categorias descritivas (ex: "Rapé", "Tabaco", "Embalagens") para facilitar a filtragem e
+            relatórios futuros.</div>
+    </div>
+
+    <!-- ===================== 6. INSUMOS ===================== -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">6</div>
+            <h2>Cadastro de Insumos</h2>
+        </div>
+
+        <p>Os insumos são as <strong>matérias-primas</strong> usadas na produção dos produtos acabados. A tela de
+            Insumos permite cadastrar cada insumo com seu preço de custo e unidade de medida.</p>
+
+        <div class="screenshot-container">
+            <img src="manual_05_insumos_1776393749462.png" alt="Insumos">
+            <div class="screenshot-caption">Figura 5 — Lista de insumos cadastrados</div>
+        </div>
+
+        <h3>Campos do Insumo</h3>
+        <ul class="field-list">
+            <li><strong>Nome:</strong> Nome do insumo (ex: Mapacho, Tsunu)</li>
+            <li><strong>Categoria:</strong> Classificação (ex: Ervas, Minerais)</li>
+            <li><strong>Unidade:</strong> Unidade de medida (g, kg, un, ml, L)</li>
+            <li><strong>Preço de Custo:</strong> Valor unitário de aquisição (R$)</li>
+            <li><strong>Estoque Mínimo:</strong> Limite abaixo do qual o Dashboard gera alerta</li>
+        </ul>
+    </div>
+
+    <!-- ===================== 7. PARCEIROS ===================== -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">7</div>
+            <h2>Cadastro de Parceiros</h2>
+        </div>
+
+        <p>Os Parceiros são as pessoas ou lojas que <strong>recebem produtos em consignação</strong> para revenda. Cada
+            parceiro possui uma comissão percentual sobre o valor das vendas.</p>
+
+        <div class="screenshot-container">
+            <img src="manual_06_parceiros_1776394590921.png" alt="Parceiros">
+            <div class="screenshot-caption">Figura 6 — Lista de parceiros de consignação</div>
+        </div>
+
+        <h3>Informações da Tabela</h3>
+        <table>
+            <tr>
+                <th>Coluna</th>
+                <th>Descrição</th>
+            </tr>
+            <tr>
+                <td><strong>Nome / Fantasia</strong></td>
+                <td>Nome do parceiro ou nome fantasia da loja</td>
+            </tr>
+            <tr>
+                <td><strong>Contato</strong></td>
+                <td>Telefone ou WhatsApp do parceiro</td>
+            </tr>
+            <tr>
+                <td><strong>Cidade / UF</strong></td>
+                <td>Localização do parceiro</td>
+            </tr>
+            <tr>
+                <td><strong>Status</strong></td>
+                <td>ATIVO ou INATIVO</td>
+            </tr>
+            <tr>
+                <td><strong>Comissão</strong></td>
+                <td>Percentual de comissão do parceiro sobre as vendas (%)</td>
+            </tr>
+            <tr>
+                <td><strong>Estoque</strong></td>
+                <td>Quantidade de produtos em consignação com o parceiro</td>
+            </tr>
+        </table>
+
+        <h3>Como cadastrar um novo parceiro</h3>
+        <ol class="steps">
+            <li>Clique em <strong>"+ Novo Parceiro"</strong></li>
+            <li>Preencha: Nome, Contato, Cidade/UF</li>
+            <li>Defina o <strong>Percentual de Comissão</strong> (ex: 20% significa que o parceiro fica com 20% do valor
+                da venda)</li>
+            <li>Clique em <strong>"Salvar"</strong></li>
+        </ol>
+
+        <div class="warning">A comissão deve ser definida no momento do cadastro. Ela será usada automaticamente nos
+            fechamentos para calcular o valor de repasse à HAUXHAUX.</div>
+    </div>
+
+    <!-- ===================== 8. ESTOQUE ===================== -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">8</div>
+            <h2>Controle de Estoque</h2>
+        </div>
+
+        <p>A tela de Estoque apresenta a <strong>visão consolidada</strong> de todos os saldos — tanto do estoque
+            interno (HAUXHAUX) quanto dos produtos que estão com parceiros em consignação.</p>
+
+        <div class="screenshot-container">
+            <img src="manual_07_estoque_1776394595259.png" alt="Estoque">
+            <div class="screenshot-caption">Figura 7 — Controle de estoque consolidado</div>
+        </div>
+
+        <h3>Movimentações que afetam o estoque</h3>
+        <table>
+            <tr>
+                <th>Operação</th>
+                <th>Efeito no Estoque</th>
+            </tr>
+            <tr>
+                <td>Produção confirmada</td>
+                <td>➕ Adiciona ao estoque interno</td>
+            </tr>
+            <tr>
+                <td>Compra confirmada</td>
+                <td>➕ Adiciona insumos ao estoque</td>
+            </tr>
+            <tr>
+                <td>Remessa para parceiro</td>
+                <td>➖ Remove do estoque interno, adiciona ao parceiro</td>
+            </tr>
+            <tr>
+                <td>Devolução de parceiro</td>
+                <td>➕ Retorna ao estoque interno, remove do parceiro</td>
+            </tr>
+            <tr>
+                <td>Venda direta</td>
+                <td>➖ Remove do estoque interno</td>
+            </tr>
+            <tr>
+                <td>Fechamento (vendas)</td>
+                <td>➖ Remove do estoque do parceiro</td>
+            </tr>
+        </table>
+
+        <div class="info">O estoque é atualizado automaticamente a cada operação. Não é necessário fazer ajustes manuais
+            em condições normais.</div>
+    </div>
+
+    <!-- ===================== 9. PRODUÇÃO ===================== -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">9</div>
+            <h2>Registro de Produção</h2>
+        </div>
+
+        <p>A tela de Produção permite registrar os <strong>lotes de produtos fabricados</strong>. Cada lote recebe um
+            código automático (ex: LOT-175501) e pode ser confirmado para dar entrada no estoque.</p>
+
+        <div class="screenshot-container">
+            <img src="manual_08_producao_1776394599662.png" alt="Produção">
+            <div class="screenshot-caption">Figura 8 — Registro de lotes de produção</div>
+        </div>
+
+        <h3>Como registrar uma nova produção</h3>
+        <ol class="steps">
+            <li>Clique em <strong>"+ Nova Produção"</strong></li>
+            <li>Selecione o <strong>Produto</strong> a ser produzido</li>
+            <li>Informe a <strong>Quantidade</strong> produzida (use os botões <strong>+</strong> e <strong>−</strong>
+                ou digite diretamente)</li>
+            <li>Clique em <strong>"Salvar"</strong> — o lote é criado com status <strong>PENDENTE</strong></li>
+            <li>Quando a produção for finalizada, clique em <strong>"Confirmar"</strong> para dar entrada no estoque
+            </li>
+        </ol>
+
+        <h3>Status possíveis</h3>
+        <ul class="field-list">
+            <li><strong style="color: orange">PENDENTE:</strong> Lote registrado mas ainda não confirmado. Estoque NÃO
+                foi atualizado</li>
+            <li><strong style="color: green">CONFIRMADA:</strong> Produção confirmada. Estoque foi incrementado
+                automaticamente</li>
+        </ul>
+    </div>
+
+    <!-- ===================== 10. COMPRAS ===================== -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">10</div>
+            <h2>Registro de Compras</h2>
+        </div>
+
+        <p>A tela de Compras permite registrar a <strong>aquisição de insumos</strong> (matérias-primas). Cada compra
+            pode conter múltiplos itens e dá entrada automática no estoque de insumos quando confirmada.</p>
+
+        <div class="screenshot-container">
+            <img src="manual_09_compras_1776394603989.png" alt="Compras">
+            <div class="screenshot-caption">Figura 9 — Registro de compras de insumos</div>
+        </div>
+
+        <h3>Como registrar uma nova compra</h3>
+        <ol class="steps">
+            <li>Clique em <strong>"+ Nova Compra"</strong></li>
+            <li>Selecione o <strong>Insumo</strong> a ser comprado</li>
+            <li>Informe a <strong>Quantidade</strong> e o <strong>Valor Unitário</strong></li>
+            <li>Adicione mais itens se necessário</li>
+            <li>Clique em <strong>"Salvar"</strong> para registrar a compra</li>
+        </ol>
+
+        <div class="tip">O valor unitário informado na compra é usado para cálculo do custo médio dos insumos.</div>
+    </div>
+
+    <!-- ===================== 11. REMESSAS ===================== -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">11</div>
+            <h2>Remessas em Consignação</h2>
+        </div>
+
+        <p>As Remessas representam o <strong>envio de produtos para parceiros</strong> revendedores. Quando uma remessa
+            é confirmada, os produtos saem do estoque interno e ficam registrados como estoque do parceiro.</p>
+
+        <div class="screenshot-container">
+            <img src="manual_10_remessas_1776394612716.png" alt="Remessas">
+            <div class="screenshot-caption">Figura 10 — Remessas de consignação para parceiros</div>
+        </div>
+
+        <h3>Como criar uma nova remessa</h3>
+        <ol class="steps">
+            <li>Clique em <strong>"+ Nova Remessa"</strong></li>
+            <li>Selecione o <strong>Parceiro</strong> de destino</li>
+            <li>Adicione os <strong>Produtos</strong> à remessa</li>
+            <li>Para cada produto, defina a <strong>Quantidade</strong> e o <strong>Preço de Venda</strong></li>
+            <li>Clique em <strong>"Salvar"</strong> para criar a remessa</li>
+            <li>Confirme a remessa para dar baixa no estoque interno</li>
+        </ol>
+
+        <div class="warning">O preço de venda definido na remessa será o mesmo usado no fechamento. Não é possível
+            alterá-lo depois que a remessa for confirmada.</div>
+
+        <div class="info">O valor padrão do produto vem preenchido automaticamente, mas pode ser editado antes de
+            confirmar a remessa.</div>
+    </div>
+
+    <!-- ===================== 12. DEVOLUÇÕES ===================== -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">12</div>
+            <h2>Devoluções de Consignação</h2>
+        </div>
+
+        <p>Quando um parceiro deseja <strong>devolver produtos não vendidos</strong>, utiliza-se a tela de Devoluções.
+            Os produtos devolvidos retornam ao estoque interno da HAUXHAUX.</p>
+
+        <div class="screenshot-container">
+            <img src="manual_11_devolucoes_1776394617165.png" alt="Devoluções">
+            <div class="screenshot-caption">Figura 11 — Registro de devoluções de consignação</div>
+        </div>
+
+        <h3>Como registrar uma devolução</h3>
+        <ol class="steps">
+            <li>Clique em <strong>"+ Nova Devolução"</strong></li>
+            <li>Selecione o <strong>Parceiro</strong> que está devolvendo</li>
+            <li>Selecione os <strong>Produtos</strong> a serem devolvidos (apenas produtos que o parceiro possui em
+                consignação são exibidos)</li>
+            <li>Informe a <strong>Quantidade</strong> devolvida</li>
+            <li>Confirme a devolução</li>
+        </ol>
+
+        <div class="tip">A devolução reduz automaticamente o estoque do parceiro e aumenta o estoque interno.</div>
+    </div>
+
+    <!-- ===================== 13. FECHAMENTOS ===================== -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">13</div>
+            <h2>Fechamentos de Consignação</h2>
+        </div>
+
+        <p>O Fechamento é o processo de <strong>contabilizar as vendas de um parceiro</strong>. É feito periodicamente
+            (geralmente mensal) para apurar quantos produtos o parceiro vendeu e calcular os valores de comissão e
+            repasse.</p>
+
+        <div class="screenshot-container">
+            <img src="manual_12_fechamentos_1776394621686.png" alt="Fechamentos">
+            <div class="screenshot-caption">Figura 12 — Fechamentos de consignação</div>
+        </div>
+
+        <h3>Como fazer um fechamento</h3>
+        <ol class="steps">
+            <li>Clique em <strong>"+ Novo Fechamento"</strong></li>
+            <li>Selecione o <strong>Parceiro</strong></li>
+            <li>O sistema exibe automaticamente os produtos que o parceiro possui em consignação com os <strong>preços
+                    de venda fixos</strong> (definidos na remessa)</li>
+            <li>Informe a <strong>Quantidade Vendida</strong> de cada produto</li>
+            <li>O sistema calcula automaticamente:
+                <ul class="field-list">
+                    <li><strong>Valor Total Vendido:</strong> soma de (preço × quantidade vendida)</li>
+                    <li><strong>Comissão do Parceiro:</strong> percentual × valor vendido</li>
+                    <li><strong>Valor de Repasse:</strong> valor vendido − comissão (o que a HAUXHAUX recebe)</li>
+                </ul>
+            </li>
+            <li>Confirme o fechamento</li>
+        </ol>
+
+        <div class="warning">O valor de venda dos produtos no fechamento NÃO pode ser editado — ele vem fixo da remessa
+            de consignação original para manter a integridade do controle financeiro.</div>
+
+        <div class="info">Ao confirmar o fechamento, uma <strong>Conta a Receber</strong> é gerada automaticamente no
+            módulo financeiro com o valor de repasse.</div>
+    </div>
+
+    <!-- ===================== 14. VENDAS DIRETAS ===================== -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">14</div>
+            <h2>Vendas Diretas</h2>
+        </div>
+
+        <p>As Vendas Diretas são vendas feitas <strong>diretamente para clientes finais</strong>, sem intermediação de
+            parceiros. Nesse caso, não há comissão — o valor integral da venda é da HAUXHAUX.</p>
+
+        <div class="screenshot-container">
+            <img src="manual_13_vendas_diretas_1776394626191.png" alt="Vendas Diretas">
+            <div class="screenshot-caption">Figura 13 — Registro de vendas diretas</div>
+        </div>
+
+        <h3>Como registrar uma venda direta</h3>
+        <ol class="steps">
+            <li>Clique em <strong>"+ Nova Venda"</strong></li>
+            <li>Informe o <strong>Nome do Cliente</strong> (opcional)</li>
+            <li>Adicione os <strong>Produtos</strong> ao pedido</li>
+            <li>Para cada produto, ajuste a <strong>Quantidade</strong> e o <strong>Preço de Venda</strong> (o preço
+                padrão vem preenchido mas pode ser editado)</li>
+            <li>Confirme a venda</li>
+        </ol>
+
+        <h3>Diferenças entre Venda Direta e Consignação</h3>
+        <table>
+            <tr>
+                <th>Aspecto</th>
+                <th>Venda Direta</th>
+                <th>Consignação</th>
+            </tr>
+            <tr>
+                <td>Comissão</td>
+                <td>Não tem (valor integral)</td>
+                <td>% definido no cadastro do parceiro</td>
+            </tr>
+            <tr>
+                <td>Preço de venda</td>
+                <td>Editável no momento da venda</td>
+                <td>Fixo na remessa</td>
+            </tr>
+            <tr>
+                <td>Estoque</td>
+                <td>Baixa imediata do estoque interno</td>
+                <td>Transfere para estoque do parceiro</td>
+            </tr>
+            <tr>
+                <td>Financeiro</td>
+                <td>Conta a receber com valor integral</td>
+                <td>Conta a receber com valor de repasse (após comissão)</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- ===================== 15. FINANCEIRO ===================== -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">15</div>
+            <h2>Contas a Receber (Financeiro)</h2>
+        </div>
+
+        <p>A tela de Contas a Receber consolida todas as <strong>cobranças pendentes e recebidas</strong>. As contas são
+            geradas automaticamente a partir de fechamentos de consignação e vendas diretas.</p>
+
+        <div class="screenshot-container">
+            <img src="manual_14_financeiro_1776394630797.png" alt="Contas a Receber">
+            <div class="screenshot-caption">Figura 14 — Painel de Contas a Receber</div>
+        </div>
+
+        <h3>Cards de Resumo</h3>
+        <table>
+            <tr>
+                <th>Card</th>
+                <th>Descrição</th>
+            </tr>
+            <tr>
+                <td><strong>Total em Aberto</strong></td>
+                <td>Soma de todas as contas pendentes de recebimento (R$)</td>
+            </tr>
+            <tr>
+                <td><strong>Total Recebido</strong></td>
+                <td>Soma de todas as contas já quitadas (R$)</td>
+            </tr>
+        </table>
+
+        <h3>Como dar baixa em uma conta</h3>
+        <ol class="steps">
+            <li>Localize a conta na lista</li>
+            <li>Clique no botão <strong>"Receber"</strong> ou <strong>"Quitar"</strong></li>
+            <li>Confirme o recebimento do valor</li>
+        </ol>
+
+        <div class="info">As contas de <strong>consignação</strong> exibem o valor de repasse (já descontada a comissão
+            do parceiro). As contas de <strong>vendas diretas</strong> exibem o valor integral.</div>
+    </div>
+
+    <!-- ===================== 16. PORTAL - VISÃO GERAL ===================== -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">16</div>
+            <h2>Portal do Parceiro — Visão Geral</h2>
+        </div>
+
+        <p>O <strong>Portal do Parceiro</strong> é a área exclusiva para os parceiros de consignação. Ao fazer login com
+            suas credenciais de parceiro, o sistema exibe um painel simplificado com informações relevantes sobre o
+            estoque consignado, vendas e declarações de consumo.</p>
+
+        <div class="screenshot-container">
+            <img src="manual_15_portal_home_1776395761040.png" alt="Portal do Parceiro - Início">
+            <div class="screenshot-caption">Figura 15 — Painel inicial do Portal do Parceiro</div>
+        </div>
+
+        <h3>Barra de Navegação</h3>
+        <p>O portal possui uma barra de navegação horizontal no topo com os seguintes itens:</p>
+        <table>
+            <tr>
+                <th>Item</th>
+                <th>Função</th>
+            </tr>
+            <tr>
+                <td><strong>🏠 Início</strong></td>
+                <td>Retorna ao painel principal</td>
+            </tr>
+            <tr>
+                <td><strong>📦 Meu Estoque</strong></td>
+                <td>Visualiza os produtos em consignação</td>
+            </tr>
+            <tr>
+                <td><strong>🛒 Registrar Venda</strong></td>
+                <td>Registra vendas realizadas pelo parceiro</td>
+            </tr>
+            <tr>
+                <td><strong>📋 Declarar Consumo</strong></td>
+                <td>Declara o consumo mensal de produtos</td>
+            </tr>
+            <tr>
+                <td><strong>📜 Histórico</strong></td>
+                <td>Consulta o histórico de fechamentos, declarações e remessas</td>
+            </tr>
+        </table>
+
+        <h3>Cards do Painel</h3>
+        <ul class="field-list">
+            <li><strong>Produtos Consignados:</strong> Quantidade de tipos de produtos que o parceiro tem em estoque
+            </li>
+            <li><strong>Total de Itens:</strong> Soma total de unidades/gramas de todos os produtos em consignação</li>
+            <li><strong>Declarações:</strong> Número de declarações de consumo registradas</li>
+        </ul>
+
+        <h3>Seções do Painel</h3>
+        <ul class="field-list">
+            <li><strong>🧴 Meu Estoque Consignado:</strong> Lista os produtos com suas quantidades atuais</li>
+            <li><strong>📋 Minhas Declarações:</strong> Mostra as declarações de consumo com status (RASCUNHO ou
+                ENVIADO)</li>
+            <li><strong>💰 Fechamentos:</strong> Exibe os fechamentos mensais com valor e status (ABERTO ou FECHADO)
+            </li>
+        </ul>
+
+        <div class="tip">O parceiro pode acompanhar em tempo real o saldo de produtos em consignação e o status dos
+            fechamentos diretamente pelo portal.</div>
+    </div>
+
+    <!-- ===================== 17. PORTAL - REGISTRAR VENDA ===================== -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">17</div>
+            <h2>Portal do Parceiro — Registrar Venda</h2>
+        </div>
+
+        <p>A tela "Registrar Venda" permite ao parceiro <strong>informar cada venda realizada</strong> do estoque
+            consignado. As vendas são acumuladas para o fechamento mensal.</p>
+
+        <div class="screenshot-container">
+            <img src="manual_16_portal_vendas_1776395765405.png" alt="Portal - Registrar Venda">
+            <div class="screenshot-caption">Figura 16 — Registrar venda no Portal do Parceiro</div>
+        </div>
+
+        <h3>Como registrar uma venda</h3>
+        <ol class="steps">
+            <li>Selecione o <strong>Produto</strong> vendido no campo "Produto"</li>
+            <li>Informe a <strong>Quantidade</strong> vendida</li>
+            <li>Clique em <strong>"✅ Confirmar Venda"</strong></li>
+        </ol>
+
+        <h3>Informações exibidas</h3>
+        <ul class="field-list">
+            <li><strong>Vendas Este Mês:</strong> Número total de produtos vendidos no mês atual</li>
+            <li><strong>Total Acumulado:</strong> Valor total em R$ das vendas do mês (a ser apurado no fechamento)</li>
+            <li><strong>Vendas do Mês Atual:</strong> Tabela detalhada com cada produto vendido, quantidade, preço
+                unitário e total</li>
+        </ul>
+
+        <div class="info">O preço unitário exibido é o <strong>preço fixo da remessa</strong> (definido pelo
+            administrador). O parceiro não pode alterar o preço de venda.</div>
+
+        <div class="warning">Após confirmar uma venda, ela não pode ser excluída pelo parceiro. Em caso de erro, entre
+            em contato com o administrador.</div>
+    </div>
+
+    <!-- ===================== 18. PORTAL - DECLARAR CONSUMO ===================== -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">18</div>
+            <h2>Portal do Parceiro — Declarar Consumo</h2>
+        </div>
+
+        <p>A tela "Declarar Consumo" permite ao parceiro <strong>informar mensalmente a quantidade de produtos
+                consumidos</strong> (vendidos ou utilizados). Esta declaração é usada como referência para o fechamento
+            mensal.</p>
+
+        <div class="screenshot-container">
+            <img src="manual_17_portal_consumo_1776395769648.png" alt="Portal - Declarar Consumo">
+            <div class="screenshot-caption">Figura 17 — Declaração de consumo mensal</div>
+        </div>
+
+        <h3>Como declarar o consumo</h3>
+        <ol class="steps">
+            <li>Selecione o <strong>Mês</strong> e <strong>Ano</strong> da competência</li>
+            <li>Para cada produto listado, informe a <strong>quantidade consumida no mês</strong> (use os botões
+                <strong>+</strong> e <strong>−</strong> ou digite diretamente)</li>
+            <li>Adicione <strong>Observações</strong> se necessário (campo opcional)</li>
+            <li>Clique em <strong>"Salvar rascunho"</strong> para salvar sem enviar</li>
+            <li>Quando estiver tudo certo, clique em <strong>"📤 Enviar declaração"</strong> para enviar ao
+                administrador</li>
+        </ol>
+
+        <h3>Status da Declaração</h3>
+        <table>
+            <tr>
+                <th>Status</th>
+                <th>Significado</th>
+            </tr>
+            <tr>
+                <td><strong style="color: gray">RASCUNHO</strong></td>
+                <td>Declaração salva mas NÃO enviada. Pode ser editada livremente</td>
+            </tr>
+            <tr>
+                <td><strong style="color: green">ENVIADO</strong></td>
+                <td>Declaração enviada ao administrador. Não pode mais ser editada</td>
+            </tr>
+        </table>
+
+        <div class="tip">Salve como rascunho ao longo do mês e envie a declaração final no último dia do período.</div>
+    </div>
+
+    <!-- ===================== 19. PORTAL - HISTÓRICO ===================== -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">19</div>
+            <h2>Portal do Parceiro — Histórico</h2>
+        </div>
+
+        <p>A tela de Histórico reúne <strong>todas as informações de movimentação</strong> do parceiro em um único
+            lugar: fechamentos, declarações de consumo, remessas recebidas e devoluções.</p>
+
+        <div class="screenshot-container">
+            <img src="manual_18_portal_historico_1776395774080.png" alt="Portal - Histórico">
+            <div class="screenshot-caption">Figura 18 — Histórico completo do parceiro</div>
+        </div>
+
+        <h3>Seções do Histórico</h3>
+        <table>
+            <tr>
+                <th>Seção</th>
+                <th>O que exibe</th>
+            </tr>
+            <tr>
+                <td><strong>📊 Fechamentos Mensais</strong></td>
+                <td>Competência, status (ABERTO/FECHADO), valor total e situação da cobrança</td>
+            </tr>
+            <tr>
+                <td><strong>📋 Declarações de Consumo</strong></td>
+                <td>Competência, status (RASCUNHO/ENVIADO), produtos declarados e data de envio</td>
+            </tr>
+            <tr>
+                <td><strong>🚚 Remessas Recebidas</strong></td>
+                <td>Data e produtos recebidos em consignação</td>
+            </tr>
+            <tr>
+                <td><strong>📥 Devoluções</strong></td>
+                <td>Registro de produtos devolvidos ao administrador</td>
+            </tr>
+        </table>
+
+        <div class="info">O parceiro pode consultar o histórico a qualquer momento para acompanhar sua movimentação e
+            verificar valores pendentes.</div>
+    </div>
+
+    <!-- ===================== 20. FLUXO OPERACIONAL ===================== -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">20</div>
+            <h2>Fluxo Operacional Completo</h2>
+        </div>
+
+        <p>Abaixo está o fluxo completo de operação do sistema, desde a compra de insumos até o recebimento financeiro:
+        </p>
+
+        <h3>Fluxo de Consignação</h3>
+        <div
+            style="background: #f5f0e8; padding: 24px; border-radius: 12px; margin: 16px 0; text-align: center; font-size: 15px; line-height: 2.2;">
+            <strong>1.</strong> Compra de Insumos 📦<br>
+            ↓<br>
+            <strong>2.</strong> Produção (Fabricação) 🔬<br>
+            ↓<br>
+            <strong>3.</strong> Remessa para Parceiro 🚚<br>
+            ↓<br>
+            <strong>4.</strong> Parceiro Vende os Produtos 🤝<br>
+            ↓<br>
+            <strong>5.</strong> Fechamento Mensal 📋<br>
+            (apura vendas, calcula comissão e repasse)<br>
+            ↓<br>
+            <strong>6.</strong> Conta a Receber Gerada 💰<br>
+            ↓<br>
+            <strong>7.</strong> Recebimento do Valor 💵
+        </div>
+
+        <h3>Fluxo de Venda Direta</h3>
+        <div
+            style="background: #f5f0e8; padding: 24px; border-radius: 12px; margin: 16px 0; text-align: center; font-size: 15px; line-height: 2.2;">
+            <strong>1.</strong> Compra de Insumos 📦<br>
+            ↓<br>
+            <strong>2.</strong> Produção (Fabricação) 🔬<br>
+            ↓<br>
+            <strong>3.</strong> Venda Direta ao Cliente 🛒<br>
+            (baixa imediata do estoque, valor integral)<br>
+            ↓<br>
+            <strong>4.</strong> Conta a Receber Gerada 💰<br>
+            ↓<br>
+            <strong>5.</strong> Recebimento do Valor 💵
+        </div>
+
+        <h3>Resumo de Ações por Módulo</h3>
+        <table>
+            <tr>
+                <th>Módulo</th>
+                <th>Ação Principal</th>
+                <th>Resultado</th>
+            </tr>
+            <tr>
+                <td>Compras</td>
+                <td>Registrar compra de insumos</td>
+                <td>+ Estoque de insumos</td>
+            </tr>
+            <tr>
+                <td>Produção</td>
+                <td>Registrar lote e confirmar</td>
+                <td>+ Estoque de produtos</td>
+            </tr>
+            <tr>
+                <td>Remessas</td>
+                <td>Enviar produtos ao parceiro</td>
+                <td>− Estoque interno, + Estoque parceiro</td>
+            </tr>
+            <tr>
+                <td>Devoluções</td>
+                <td>Receber produtos devolvidos</td>
+                <td>+ Estoque interno, − Estoque parceiro</td>
+            </tr>
+            <tr>
+                <td>Fechamentos</td>
+                <td>Apurar vendas do parceiro</td>
+                <td>Gera conta a receber com valor de repasse</td>
+            </tr>
+            <tr>
+                <td>Vendas Diretas</td>
+                <td>Vender para cliente final</td>
+                <td>− Estoque interno, gera conta a receber integral</td>
+            </tr>
+            <tr>
+                <td>Contas a Receber</td>
+                <td>Quitar pagamento recebido</td>
+                <td>Atualiza status para "Recebido"</td>
+            </tr>
+        </table>
+
+        <div class="tip">Mantenha o hábito de fazer fechamentos mensais com os parceiros para ter um controle financeiro
+            sempre atualizado.</div>
+    </div>
+
+</body>
+
+</html>

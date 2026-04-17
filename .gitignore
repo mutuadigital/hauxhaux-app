@@ -34,3 +34,9 @@ Thumbs.db
 
 # Netlify
 .netlify/
+
+# Deploy logs
+deploy*.log
+
+# Gemini AI
+.gemini/
