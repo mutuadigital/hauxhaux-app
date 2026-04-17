@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual de Instalação no Servidor — HAUXHAUX</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: #1e1e1e;
+            background: #fff;
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        /* CAPA */
+        .cover {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 60%, #21262d 100%);
+            color: #c9a84c;
+            text-align: center;
+            page-break-after: always;
+        }
+
+        .cover h1 {
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: 8px;
+            margin-bottom: 8px;
+        }
+
+        .cover .subtitle {
+            font-size: 16px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            color: #8b949e;
+            margin-bottom: 60px;
+        }
+
+        .cover .doc-title {
+            font-size: 26px;
+            font-weight: 600;
+            color: #fff;
+            border-top: 2px solid #c9a84c;
+            border-bottom: 2px solid #c9a84c;
+            padding: 18px 60px;
+            margin-bottom: 40px;
+        }
+
+        .cover .version {
+            font-size: 13px;
+            color: #666;
+        }
+
+        /* ALERTA DE DESTINATÁRIO */
+        .recipient-box {
+            background: #0d1117;
+            color: #e6edf3;
+            text-align: center;
+            padding: 30px;
+            font-size: 15px;
+            border-top: 3px solid #c9a84c;
+        }
+
+        .recipient-box strong {
+            color: #c9a84c;
+            font-size: 16px;
+        }
+
+        /* SEÇÕES */
+        .section {
+            padding: 40px 60px;
+            page-break-before: always;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #c9a84c;
+            padding-bottom: 12px;
+        }
+
+        .section-number {
+            background: #0d1117;
+            color: #c9a84c;
+            font-size: 20px;
+            font-weight: 800;
+            width: 46px;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            margin-right: 14px;
+            flex-shrink: 0;
+        }
+
+        .section h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0d1117;
+        }
+
+        .section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f3a5f;
+            margin: 22px 0 8px;
+        }
+
+        .section p {
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+
+        /* BLOCOS DE CÓDIGO */
+        .code-block {
+            background: #0d1117;
+            border-radius: 10px;
+            padding: 20px 24px;
+            margin: 14px 0;
+            position: relative;
+            border: 1px solid #30363d;
+            overflow: auto;
+        }
+
+        .code-block .label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #8b949e;
+            margin-bottom: 10px;
+        }
+
+        .code-block code {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 13px;
+            color: #e6edf3;
+            white-space: pre;
+            display: block;
+            line-height: 1.8;
+        }
+
+        .code-block code .comment {
+            color: #8b949e;
+        }
+
+        .code-block code .keyword {
+            color: #ff7b72;
+        }
+
+        .code-block code .string {
+            color: #a5d6ff;
+        }
+
+        .code-block code .value {
+            color: #79c0ff;
+        }
+
+        .code-block .prompt {
+            color: #56d364;
+        }
+
+        /* ALERTAS */
+        .alert {
+            padding: 14px 18px;
+            margin: 14px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+        }
+
+        .alert-info {
+            background: #1c2d3c;
+            border-left: 4px solid #58a6ff;
+            color: #e6edf3;
+        }
+
+        .alert-warning {
+            background: #2d1e0c;
+            border-left: 4px solid #d29922;
+            color: #f0d990;
+        }
+
+        .alert-success {
+            background: #12261e;
+            border-left: 4px solid #3fb950;
+            color: #a5d6a7;
+        }
+
+        .alert-danger {
+            background: #2d0c0c;
+            border-left: 4px solid #f85149;
+            color: #ffa0a0;
+        }
+
+        .alert strong {
+            font-weight: 700;
+        }
+
+        /* STEPS */
+        .steps {
+            list-style: none;
+            counter-reset: step-counter;
+            margin: 10px 0;
+        }
+
+        .steps li {
+            counter-increment: step-counter;
+            padding: 10px 0 10px 42px;
+            position: relative;
+            margin-bottom: 6px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .steps li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 8px;
+            background: #c9a84c;
+            color: #fff;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* TABELAS */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 14px 0;
+            font-size: 13px;
+        }
+
+        th {
+            background: #0d1117;
+            color: #c9a84c;
+            padding: 10px 14px;
+            text-align: left;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f8f8;
+        }
+
+        /* REQUISITOS */
+        .req-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 16px 0;
+        }
+
+        .req-card {
+            border: 1px solid #e0d5c0;
+            border-radius: 10px;
+            padding: 16px 20px;
+            border-top: 3px solid #c9a84c;
+        }
+
+        .req-card h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0d1117;
+            margin-bottom: 6px;
+        }
+
+        .req-card p {
+            font-size: 13px;
+            color: #666;
+            margin: 0;
+        }
+
+        /* SUMÁRIO */
+        .toc {
+            padding: 50px 70px;
+            page-break-after: always;
+        }
+
+        .toc h2 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #0d1117;
+            border-bottom: 3px solid #c9a84c;
+            padding-bottom: 10px;
+            margin-bottom: 24px;
+        }
+
+        .toc ol {
+            list-style: none;
+            counter-reset: toc;
+        }
+
+        .toc ol li {
+            counter-increment: toc;
+            padding: 10px 0;
+            border-bottom: 1px dotted #ccc;
+            font-size: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .toc ol li::before {
+            content: counter(toc)".";
+            font-weight: 700;
+            color: #c9a84c;
+            margin-right: 10px;
+        }
+
+        @media print {
+            body {
+                font-size: 12px;
+            }
+
+            .section {
+                padding: 30px 40px;
+            }
+
+            .code-block code {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- CAPA -->
+    <div class="cover">
+        <h1>HAUXHAUX</h1>
+        <div class="subtitle">SISTEMA DE GESTÃO</div>
+        <div class="doc-title">Manual de Instalação no Servidor</div>
+        <div class="version">Versão 1.0 — Abril 2026</div>
+    </div>
+
+    <div class="recipient-box">
+        <strong>📋 Documento Destinado ao Técnico / Parceiro de Hospedagem</strong><br>
+        Este manual contém todas as instruções necessárias para instalar e configurar o sistema HAUXHAUX em um servidor
+        VPS ou dedicado com Linux.<br>
+        Domain de destino: <strong>gestao.hauxhaux.com.br</strong>
+    </div>
+
+    <!-- SUMÁRIO -->
+    <div class="toc">
+        <h2>Sumário</h2>
+        <ol>
+            <li>Requisitos do Servidor</li>
+            <li>Preparação do Servidor (Ubuntu/Debian)</li>
+            <li>Instalação do Node.js 20</li>
+            <li>Configuração do Banco de Dados</li>
+            <li>Download do Código-Fonte</li>
+            <li>Configuração das Variáveis de Ambiente</li>
+            <li>Build e Inicialização do Sistema</li>
+            <li>Configuração do PM2 (Auto-restart)</li>
+            <li>Configuração do Nginx (Proxy Reverso)</li>
+            <li>Certificado SSL com Let's Encrypt</li>
+            <li>Configuração de DNS</li>
+            <li>Verificação Final e Testes</li>
+            <li>Comandos Úteis de Manutenção</li>
+            <li>Solução de Problemas Comuns</li>
+        </ol>
+    </div>
+
+    <!-- 1. REQUISITOS -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">1</div>
+            <h2>Requisitos do Servidor</h2>
+        </div>
+
+        <p>O sistema HAUXHAUX é uma aplicação <strong>Next.js 15</strong> com banco de dados PostgreSQL. Os requisitos
+            mínimos para rodar em produção são:</p>
+
+        <div class="req-grid">
+            <div class="req-card">
+                <h4>🖥️ Sistema Operacional</h4>
+                <p>Ubuntu 22.04 LTS ou 24.04 LTS (recomendado)<br>Debian 11 ou 12 também funciona</p>
+            </div>
+            <div class="req-card">
+                <h4>⚡ CPU e RAM</h4>
+                <p>Mínimo: 1 vCPU / 1 GB RAM<br>Recomendado: 2 vCPU / 2 GB RAM</p>
+            </div>
+            <div class="req-card">
+                <h4>💾 Disco</h4>
+                <p>Mínimo: 10 GB livres<br>Recomendado: 20 GB SSD</p>
+            </div>
+            <div class="req-card">
+                <h4>🌐 Rede</h4>
+                <p>IP público fixo<br>Portas 80 e 443 abertas no firewall</p>
+            </div>
+        </div>
+
+        <h3>Softwares necessários</h3>
+        <table>
+            <tr>
+                <th>Software</th>
+                <th>Versão</th>
+                <th>Função</th>
+            </tr>
+            <tr>
+                <td><strong>Node.js</strong></td>
+                <td>20.x LTS</td>
+                <td>Executar a aplicação Next.js</td>
+            </tr>
+            <tr>
+                <td><strong>npm</strong></td>
+                <td>10+</td>
+                <td>Gerenciador de pacotes (vem com Node.js)</td>
+            </tr>
+            <tr>
+                <td><strong>PostgreSQL</strong></td>
+                <td>14, 15 ou 16</td>
+                <td>Banco de dados (OU usar Neon.tech)</td>
+            </tr>
+            <tr>
+                <td><strong>PM2</strong></td>
+                <td>Última versão</td>
+                <td>Processo manager / auto-restart</td>
+            </tr>
+            <tr>
+                <td><strong>Nginx</strong></td>
+                <td>1.18+</td>
+                <td>Proxy reverso + SSL</td>
+            </tr>
+            <tr>
+                <td><strong>Certbot</strong></td>
+                <td>Última versão</td>
+                <td>Certificado SSL gratuito (Let's Encrypt)</td>
+            </tr>
+            <tr>
+                <td><strong>Git</strong></td>
+                <td>2.x</td>
+                <td>Clonar o repositório</td>
+            </tr>
+        </table>
+
+        <div class="alert alert-info">
+            <strong>ℹ️ Banco de dados:</strong> O sistema está configurado para usar o <strong>Neon.tech</strong>
+            (PostgreSQL na nuvem). Se preferir usar um PostgreSQL local no servidor, veja a Seção 4. Caso mantenha o
+            Neon, pule a parte de instalação do PostgreSQL.
+        </div>
+    </div>
+
+    <!-- 2. PREPARAÇÃO DO SERVIDOR -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">2</div>
+            <h2>Preparação do Servidor (Ubuntu/Debian)</h2>
+        </div>
+
+        <p>Acesse o servidor via SSH e execute os comandos abaixo como usuário <strong>root</strong> ou com
+            <strong>sudo</strong>.</p>
+
+        <h3>2.1 Atualizar o sistema</h3>
+        <div class="code-block">
+            <div class="label">Terminal — SSH no servidor</div>
+            <code><span class="prompt">$</span> sudo apt update && sudo apt upgrade -y</code>
+        </div>
+
+        <h3>2.2 Instalar dependências básicas</h3>
+        <div class="code-block">
+            <div class="label">Terminal</div>
+            <code><span class="prompt">$</span> sudo apt install -y git curl wget build-essential nginx certbot python3-certbot-nginx</code>
+        </div>
+
+        <h3>2.3 Configurar Firewall (UFW)</h3>
+        <div class="code-block">
+            <div class="label">Terminal</div>
+            <code><span class="prompt">$</span> sudo ufw allow ssh
+<span class="prompt">$</span> sudo ufw allow 80
+<span class="prompt">$</span> sudo ufw allow 443
+<span class="prompt">$</span> sudo ufw enable
+<span class="prompt">$</span> sudo ufw status</code>
+        </div>
+
+        <h3>2.4 Criar usuário para a aplicação (boa prática)</h3>
+        <div class="code-block">
+            <div class="label">Terminal</div>
+            <code><span class="prompt">$</span> sudo adduser hauxhaux
+<span class="prompt">$</span> sudo usermod -aG sudo hauxhaux
+<span class="comment"># Troque para o usuário hauxhaux para os próximos passos</span>
+<span class="prompt">$</span> su - hauxhaux</code>
+        </div>
+    </div>
+
+    <!-- 3. NODE.JS -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">3</div>
+            <h2>Instalação do Node.js 20</h2>
+        </div>
+
+        <p>Use o <strong>NodeSource</strong> para instalar o Node.js 20 LTS (a versão mais compatível com o Next.js 15).
+        </p>
+
+        <div class="code-block">
+            <div class="label">Terminal — instalar Node.js 20 via NodeSource</div>
+            <code><span class="comment"># Adicionar repositório do NodeSource</span>
+<span class="prompt">$</span> curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+
+<span class="comment"># Instalar o Node.js</span>
+<span class="prompt">$</span> sudo apt install -y nodejs
+
+<span class="comment"># Verificar versões instaladas</span>
+<span class="prompt">$</span> node --version
+<span class="comment">  # Esperado: v20.x.x</span>
+<span class="prompt">$</span> npm --version
+<span class="comment">  # Esperado: 10.x.x</span></code>
+        </div>
+
+        <h3>Instalar PM2 (gerenciador de processos)</h3>
+        <div class="code-block">
+            <div class="label">Terminal</div>
+            <code><span class="prompt">$</span> sudo npm install -g pm2</code>
+        </div>
+    </div>
+
+    <!-- 4. BANCO DE DADOS -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">4</div>
+            <h2>Configuração do Banco de Dados</h2>
+        </div>
+
+        <div class="alert alert-success">
+            <strong>✅ Opção A (Recomendada — já configurada):</strong> O banco de dados está hospedado no
+            <strong>Neon.tech</strong> (PostgreSQL na nuvem). A string de conexão será fornecida pelo contratante. Nesse
+            caso, <strong>pule esta seção inteira</strong> e vá direto para a Seção 5.
+        </div>
+
+        <div class="alert alert-info">
+            <strong>ℹ️ Opção B — PostgreSQL local:</strong> Se preferir usar um banco de dados no próprio servidor, siga
+            os passos abaixo.
+        </div>
+
+        <h3>4.1 Instalar PostgreSQL</h3>
+        <div class="code-block">
+            <div class="label">Terminal — apenas se usar banco LOCAL</div>
+            <code><span class="prompt">$</span> sudo apt install -y postgresql postgresql-contrib
+
+<span class="comment"># Iniciar e habilitar o serviço</span>
+<span class="prompt">$</span> sudo systemctl start postgresql
+<span class="prompt">$</span> sudo systemctl enable postgresql</code>
+        </div>
+
+        <h3>4.2 Criar banco e usuário</h3>
+        <div class="code-block">
+            <div class="label">Terminal</div>
+            <code><span class="prompt">$</span> sudo -u postgres psql
+
+<span class="comment">-- Dentro do psql:</span>
+CREATE DATABASE hauxhaux;
+CREATE USER hauxhaux_user WITH PASSWORD '<span class="string">SUA_SENHA_FORTE_AQUI</span>';
+GRANT ALL PRIVILEGES ON DATABASE hauxhaux TO hauxhaux_user;
+\q</code>
+        </div>
+
+        <p>Nesse caso a sua <code>DATABASE_URL</code> será:</p>
+        <div class="code-block">
+            <div class="label">String de conexão local</div>
+            <code><span class="string">postgresql://hauxhaux_user:SUA_SENHA@localhost:5432/hauxhaux</span></code>
+        </div>
+    </div>
+
+    <!-- 5. DOWNLOAD DO CÓDIGO -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">5</div>
+            <h2>Download do Código-Fonte</h2>
+        </div>
+
+        <p>Clone o repositório do GitHub para o servidor:</p>
+
+        <div class="code-block">
+            <div class="label">Terminal — clonar o repositório</div>
+            <code><span class="comment"># Ir para o diretório de aplicações</span>
+<span class="prompt">$</span> cd /home/hauxhaux
+
+<span class="comment"># Clonar o repositório</span>
+<span class="prompt">$</span> git clone https://github.com/sourenato/hauxhaux-app.git
+
+<span class="comment"># Entrar na pasta do projeto</span>
+<span class="prompt">$</span> cd hauxhaux-app
+
+<span class="comment"># Verificar os arquivos</span>
+<span class="prompt">$</span> ls -la</code>
+        </div>
+
+        <h3>Instalar dependências do projeto</h3>
+        <div class="code-block">
+            <div class="label">Terminal — dentro da pasta hauxhaux-app</div>
+            <code><span class="comment"># Instalar todos os pacotes Node.js</span>
+<span class="prompt">$</span> npm install
+
+<span class="comment"># Aguarde o download terminar (pode levar 2-3 minutos)</span></code>
+        </div>
+
+        <div class="alert alert-warning">
+            <strong>⚠️ Atenção:</strong> O comando <code>npm install</code> pode demorar alguns minutos na primeira vez.
+            Não interrompa o processo.
+        </div>
+    </div>
+
+    <!-- 6. VARIÁVEIS DE AMBIENTE -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">6</div>
+            <h2>Configuração das Variáveis de Ambiente</h2>
+        </div>
+
+        <p>As variáveis de ambiente contêm as configurações sensíveis do sistema (banco de dados, autenticação, URL).
+            <strong>Nunca suba este arquivo para o GitHub</strong> — ele fica apenas no servidor.</p>
+
+        <h3>6.1 Criar o arquivo .env.local</h3>
+        <div class="code-block">
+            <div class="label">Terminal — criar arquivo de configuração</div>
+            <code><span class="prompt">$</span> nano /home/hauxhaux/hauxhaux-app/.env.local</code>
+        </div>
+
+        <h3>6.2 Conteúdo do .env.local</h3>
+        <p>Cole o conteúdo abaixo no editor, substituindo os valores conforme indicado:</p>
+
+        <div class="code-block">
+            <div class="label">.env.local — arquivo de configuração</div>
+            <code><span class="comment"># ====================================</span>
+<span class="comment"># HAUXHAUX — Variáveis de Ambiente</span>
+<span class="comment"># ====================================</span>
+
+<span class="comment"># Banco de dados PostgreSQL (string completa fornecida pelo contratante)</span>
+<span class="keyword">DATABASE_URL</span>=<span class="string">"postgresql://neondb_owner:SENHA@HOST/neondb?sslmode=require"</span>
+
+<span class="comment"># Secret JWT — gere um valor único com o comando abaixo:</span>
+<span class="comment"># openssl rand -base64 32</span>
+<span class="keyword">NEXTAUTH_SECRET</span>=<span class="string">"COLE_AQUI_O_SECRET_GERADO"</span>
+
+<span class="comment"># URL pública do sistema</span>
+<span class="keyword">NEXTAUTH_URL</span>=<span class="string">"https://gestao.hauxhaux.com.br"</span></code>
+        </div>
+
+        <div class="alert alert-warning">
+            <strong>⚠️ Salvar no nano:</strong> Após colar o conteúdo, pressione <code>Ctrl+X</code>, depois
+            <code>Y</code> (sim), depois <code>Enter</code> para salvar.
+        </div>
+
+        <h3>6.3 Gerar o NEXTAUTH_SECRET</h3>
+        <div class="code-block">
+            <div class="label">Terminal — gerar secret seguro</div>
+            <code><span class="prompt">$</span> openssl rand -base64 32
+<span class="comment">  # Copie o resultado e cole no .env.local acima</span></code>
+        </div>
+
+        <h3>6.4 Verificar permissões do arquivo</h3>
+        <div class="code-block">
+            <div class="label">Terminal</div>
+            <code><span class="prompt">$</span> chmod 600 /home/hauxhaux/hauxhaux-app/.env.local</code>
+        </div>
+    </div>
+
+    <!-- 7. BUILD E INICIALIZAÇÃO -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">7</div>
+            <h2>Build e Inicialização do Sistema</h2>
+        </div>
+
+        <h3>7.1 Aplicar o schema no banco de dados</h3>
+        <div class="code-block">
+            <div class="label">Terminal — dentro da pasta hauxhaux-app</div>
+            <code><span class="comment"># Gerar o Prisma Client</span>
+<span class="prompt">$</span> npx prisma generate
+
+<span class="comment"># Aplicar o schema no banco (cria as tabelas)</span>
+<span class="prompt">$</span> npx prisma db push
+
+<span class="comment"># Esperado: mensagens de "Your database is now in sync with your Prisma schema"</span></code>
+        </div>
+
+        <h3>7.2 Popular dados iniciais</h3>
+        <div class="code-block">
+            <div class="label">Terminal</div>
+            <code><span class="comment"># Criar usuário admin e categorias iniciais</span>
+<span class="prompt">$</span> npx prisma db seed
+
+<span class="comment"># Esperado:</span>
+<span class="comment"># ✅ Admin user: admin@hauxhaux.com.br</span>
+<span class="comment"># ✅ Categorias iniciais criadas</span>
+<span class="comment"># 🎉 Seed completo!</span></code>
+        </div>
+
+        <h3>7.3 Fazer o build de produção</h3>
+        <div class="code-block">
+            <div class="label">Terminal — este passo pode demorar 3-5 minutos</div>
+            <code><span class="prompt">$</span> npm run build
+
+<span class="comment"># Ao final deve aparecer algo como:</span>
+<span class="comment"># ✓ Compiled successfully</span>
+<span class="comment"># Route (app)  Size  First Load JS</span></code>
+        </div>
+
+        <h3>7.4 Testar se o sistema sobe</h3>
+        <div class="code-block">
+            <div class="label">Terminal — teste rápido (Ctrl+C para parar depois)</div>
+            <code><span class="prompt">$</span> npm start
+<span class="comment"># Acesse http://IP_DO_SERVIDOR:3000 para verificar</span>
+<span class="comment"># Ctrl+C para parar após verificar</span></code>
+        </div>
+    </div>
+
+    <!-- 8. PM2 -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">8</div>
+            <h2>Configuração do PM2 (Auto-restart)</h2>
+        </div>
+
+        <p>O <strong>PM2</strong> garante que o sistema reinicie automaticamente em caso de falha ou reboot do servidor.
+        </p>
+
+        <h3>8.1 Iniciar com PM2</h3>
+        <div class="code-block">
+            <div class="label">Terminal — dentro da pasta hauxhaux-app</div>
+            <code><span class="comment"># Iniciar a aplicação com PM2</span>
+<span class="prompt">$</span> pm2 start npm --name "hauxhaux" -- start
+
+<span class="comment"># Verificar se está rodando</span>
+<span class="prompt">$</span> pm2 status</code>
+        </div>
+
+        <h3>8.2 Configurar para reiniciar no boot do servidor</h3>
+        <div class="code-block">
+            <div class="label">Terminal</div>
+            <code><span class="comment"># Gerar script de startup (siga as instruções que aparecerem)</span>
+<span class="prompt">$</span> pm2 startup
+
+<span class="comment"># ATENÇÃO: copie e execute o comando que o PM2 mostrar, ex:</span>
+<span class="comment"># sudo env PATH=$PATH:/usr/bin /usr/local/lib/node_modules/pm2/bin/pm2 startup systemd -u hauxhaux --hp /home/hauxhaux</span>
+
+<span class="comment"># Salvar configuração atual</span>
+<span class="prompt">$</span> pm2 save</code>
+        </div>
+
+        <h3>8.3 Verificar logs</h3>
+        <div class="code-block">
+            <div class="label">Terminal</div>
+            <code><span class="comment"># Ver logs em tempo real</span>
+<span class="prompt">$</span> pm2 logs hauxhaux
+
+<span class="comment"># Ver últimas 50 linhas</span>
+<span class="prompt">$</span> pm2 logs hauxhaux --lines 50</code>
+        </div>
+    </div>
+
+    <!-- 9. NGINX -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">9</div>
+            <h2>Configuração do Nginx (Proxy Reverso)</h2>
+        </div>
+
+        <p>O Nginx recebe as requisições na porta 80/443 e as redireciona para a aplicação Next.js na porta 3000.</p>
+
+        <h3>9.1 Criar arquivo de configuração do site</h3>
+        <div class="code-block">
+            <div class="label">Terminal</div>
+            <code><span class="prompt">$</span> sudo nano /etc/nginx/sites-available/hauxhaux</code>
+        </div>
+
+        <h3>9.2 Conteúdo da configuração Nginx</h3>
+        <div class="code-block">
+            <div class="label">/etc/nginx/sites-available/hauxhaux</div>
+            <code>server {
+    listen 80;
+    server_name <span class="string">gestao.hauxhaux.com.br</span>;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        proxy_read_timeout 300s;
+        proxy_connect_timeout 75s;
+    }
+}</code>
+        </div>
+
+        <h3>9.3 Ativar o site e reiniciar Nginx</h3>
+        <div class="code-block">
+            <div class="label">Terminal</div>
+            <code><span class="comment"># Ativar o site</span>
+<span class="prompt">$</span> sudo ln -s /etc/nginx/sites-available/hauxhaux /etc/nginx/sites-enabled/
+
+<span class="comment"># Testar configuração (deve mostrar "test is successful")</span>
+<span class="prompt">$</span> sudo nginx -t
+
+<span class="comment"># Reiniciar Nginx</span>
+<span class="prompt">$</span> sudo systemctl restart nginx
+<span class="prompt">$</span> sudo systemctl enable nginx</code>
+        </div>
+    </div>
+
+    <!-- 10. SSL -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">10</div>
+            <h2>Certificado SSL com Let's Encrypt</h2>
+        </div>
+
+        <div class="alert alert-warning">
+            <strong>⚠️ Pré-requisito:</strong> O DNS do domínio <code>gestao.hauxhaux.com.br</code> deve estar apontando
+            para o IP do servidor ANTES de executar este passo. Veja a Seção 11 para configurar o DNS primeiro.
+        </div>
+
+        <h3>10.1 Emitir certificado SSL gratuito</h3>
+        <div class="code-block">
+            <div class="label">Terminal — substitua pelo seu e-mail</div>
+            <code><span class="comment"># Emitir e instalar o certificado automaticamente</span>
+<span class="prompt">$</span> sudo certbot --nginx -d gestao.hauxhaux.com.br --email <span class="string">SEU_EMAIL@gmail.com</span> --agree-tos --non-interactive
+
+<span class="comment"># Durante o processo:</span>
+<span class="comment"># - Aceitar os termos automaticamente com --agree-tos</span>
+<span class="comment"># - Certbot modificará o Nginx para usar HTTPS automaticamente</span></code>
+        </div>
+
+        <h3>10.2 Verificar renovação automática</h3>
+        <div class="code-block">
+            <div class="label">Terminal</div>
+            <code><span class="comment"># Testar renovação automática</span>
+<span class="prompt">$</span> sudo certbot renew --dry-run
+<span class="comment"># Esperado: "Congratulations, all simulated renewals succeeded"</span></code>
+        </div>
+
+        <div class="alert alert-success">
+            <strong>✅ Resultado:</strong> Após este passo, o sistema estará acessível via
+            <strong>https://gestao.hauxhaux.com.br</strong> com cadeado verde.
+        </div>
+    </div>
+
+    <!-- 11. DNS -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">11</div>
+            <h2>Configuração de DNS</h2>
+        </div>
+
+        <p>O DNS deve ser configurado no painel do registrador do domínio <strong>hauxhaux.com.br</strong>. Esta etapa é
+            responsabilidade do proprietário do domínio ou do seu técnico de DNS.</p>
+
+        <h3>Registro a adicionar</h3>
+        <table>
+            <tr>
+                <th>Tipo</th>
+                <th>Nome</th>
+                <th>Valor</th>
+                <th>TTL</th>
+            </tr>
+            <tr>
+                <td><strong>A</strong></td>
+                <td>gestao</td>
+                <td>IP_DO_SERVIDOR (ex: 191.252.100.50)</td>
+                <td>3600 (1h)</td>
+            </tr>
+        </table>
+
+        <div class="alert alert-info">
+            <strong>ℹ️ Propagação de DNS:</strong> Após criar o registro, aguarde de <strong>5 minutos a 24
+                horas</strong> para propagação. Você pode verificar em: <strong>https://dnschecker.org</strong>
+        </div>
+
+        <h3>Como verificar se o DNS está propagado</h3>
+        <div class="code-block">
+            <div class="label">Terminal — no servidor</div>
+            <code><span class="prompt">$</span> nslookup gestao.hauxhaux.com.br
+<span class="comment"># Deve mostrar o IP do servidor</span>
+
+<span class="comment"># Ou via ping:</span>
+<span class="prompt">$</span> ping gestao.hauxhaux.com.br</code>
+        </div>
+    </div>
+
+    <!-- 12. VERIFICAÇÃO FINAL -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">12</div>
+            <h2>Verificação Final e Testes</h2>
+        </div>
+
+        <p>Execute este checklist final para confirmar que tudo está funcionando:</p>
+
+        <h3>Checklist de verificação</h3>
+        <ol class="steps">
+            <li>Acesse <strong>https://gestao.hauxhaux.com.br</strong> no navegador — deve abrir a tela de login com
+                cadeado verde (HTTPS)</li>
+            <li>Faça login com <code>admin@hauxhaux.com.br</code> / <code>hauxhaux@admin2024</code></li>
+            <li>Verifique se o Dashboard carrega os indicadores corretamente</li>
+            <li>Acesse pelo menos uma sub-página (ex: Produtos) e verifique se os dados carregam</li>
+            <li>Teste o Portal do Parceiro: faça logout e entre com a conta de parceiro</li>
+            <li>Verifique se o PM2 está rodando: <code>pm2 status</code> deve mostrar <strong>online</strong></li>
+            <li>Faça um reboot do servidor (<code>sudo reboot</code>) e verifique se o sistema volta automaticamente
+            </li>
+        </ol>
+
+        <div class="alert alert-success">
+            <strong>✅ Sistema pronto!</strong> Se todos os itens acima passaram, o sistema está funcionando em produção.
+        </div>
+    </div>
+
+    <!-- 13. COMANDOS ÚTEIS -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">13</div>
+            <h2>Comandos Úteis de Manutenção</h2>
+        </div>
+
+        <h3>Atualizar o sistema (quando houver nova versão)</h3>
+        <div class="code-block">
+            <div class="label">Terminal — processo de atualização</div>
+            <code><span class="prompt">$</span> cd /home/hauxhaux/hauxhaux-app
+
+<span class="comment"># 1. Baixar atualizações do GitHub</span>
+<span class="prompt">$</span> git pull origin master
+
+<span class="comment"># 2. Instalar novas dependências (se houver)</span>
+<span class="prompt">$</span> npm install
+
+<span class="comment"># 3. Aplicar mudanças no banco (se houver)</span>
+<span class="prompt">$</span> npx prisma db push
+
+<span class="comment"># 4. Recompilar</span>
+<span class="prompt">$</span> npm run build
+
+<span class="comment"># 5. Reiniciar a aplicação</span>
+<span class="prompt">$</span> pm2 restart hauxhaux</code>
+        </div>
+
+        <h3>Comandos PM2</h3>
+        <div class="code-block">
+            <div class="label">Terminal — gerenciamento do processo</div>
+            <code><span class="comment"># Ver status</span>
+<span class="prompt">$</span> pm2 status
+
+<span class="comment"># Reiniciar</span>
+<span class="prompt">$</span> pm2 restart hauxhaux
+
+<span class="comment"># Parar</span>
+<span class="prompt">$</span> pm2 stop hauxhaux
+
+<span class="comment"># Ver logs em tempo real</span>
+<span class="prompt">$</span> pm2 logs hauxhaux
+
+<span class="comment"># Ver métricas de CPU/RAM</span>
+<span class="prompt">$</span> pm2 monit</code>
+        </div>
+
+        <h3>Comandos Nginx</h3>
+        <div class="code-block">
+            <div class="label">Terminal</div>
+            <code><span class="comment"># Reiniciar Nginx</span>
+<span class="prompt">$</span> sudo systemctl restart nginx
+
+<span class="comment"># Verificar status</span>
+<span class="prompt">$</span> sudo systemctl status nginx
+
+<span class="comment"># Ver logs de erros</span>
+<span class="prompt">$</span> sudo tail -f /var/log/nginx/error.log</code>
+        </div>
+    </div>
+
+    <!-- 14. PROBLEMAS COMUNS -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-number">14</div>
+            <h2>Solução de Problemas Comuns</h2>
+        </div>
+
+        <h3>❌ Erro: "502 Bad Gateway"</h3>
+        <div class="alert alert-danger">
+            <strong>Causa:</strong> A aplicação Next.js não está rodando na porta 3000.
+        </div>
+        <div class="code-block">
+            <div class="label">Solução</div>
+            <code><span class="prompt">$</span> pm2 status
+<span class="comment"># Verificar se está "online". Se estiver "stopped" ou "errored":</span>
+<span class="prompt">$</span> pm2 restart hauxhaux
+<span class="prompt">$</span> pm2 logs hauxhaux
+<span class="comment"># Verifique o erro nos logs</span></code>
+        </div>
+
+        <h3>❌ Erro: "Application error: a client-side exception has occurred"</h3>
+        <div class="alert alert-danger">
+            <strong>Causa:</strong> Variável de ambiente faltando ou incorreta.
+        </div>
+        <div class="code-block">
+            <div class="label">Solução</div>
+            <code><span class="comment"># Verificar se o .env.local existe e tem os campos corretos:</span>
+<span class="prompt">$</span> cat /home/hauxhaux/hauxhaux-app/.env.local
+
+<span class="comment"># Após corrigir, rebuild e reiniciar:</span>
+<span class="prompt">$</span> npm run build && pm2 restart hauxhaux</code>
+        </div>
+
+        <h3>❌ Erro: "PrismaClientInitializationError" / "Connection refused"</h3>
+        <div class="alert alert-danger">
+            <strong>Causa:</strong> String de conexão do banco incorreta ou banco inacessível.
+        </div>
+        <div class="code-block">
+            <div class="label">Solução</div>
+            <code><span class="comment"># Testar a conexão com o banco:</span>
+<span class="prompt">$</span> npx prisma db push
+<span class="comment"># Se falhar, verifique a DATABASE_URL no .env.local</span></code>
+        </div>
+
+        <h3>❌ Erro: "Port 3000 already in use"</h3>
+        <div class="code-block">
+            <div class="label">Solução</div>
+            <code><span class="comment"># Verificar o que está usando a porta 3000:</span>
+<span class="prompt">$</span> sudo lsof -i :3000
+<span class="comment"># Matar o processo:</span>
+<span class="prompt">$</span> sudo kill -9 PID_DO_PROCESSO
+<span class="prompt">$</span> pm2 start npm --name "hauxhaux" -- start</code>
+        </div>
+
+        <h3>❌ Certificado SSL não renova automaticamente</h3>
+        <div class="code-block">
+            <div class="label">Solução</div>
+            <code><span class="comment"># Renovar manualmente:</span>
+<span class="prompt">$</span> sudo certbot renew
+<span class="prompt">$</span> sudo systemctl restart nginx</code>
+        </div>
+
+        <div class="alert alert-info">
+            <strong>ℹ️ Suporte:</strong> Em caso de dúvidas ou problemas, entre em contato com o desenvolvedor do
+            sistema.
+        </div>
+    </div>
+
+</body>
+
+</html>
