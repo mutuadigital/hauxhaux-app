@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "node app.js",
+    "start:next": "next start -p 3001",
     "lint": "next lint",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
