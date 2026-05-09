@@ -19,6 +19,7 @@ export async function GET(req: Request) {
             categoria: { select: { nome: true } },
             estoque: { select: { quantidadeAtual: true } },
         },
+        // select extra scalars via include (prisma includes all scalars by default)
     })
     return NextResponse.json(produtos)
 }

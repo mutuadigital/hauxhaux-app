@@ -1,0 +1,26 @@
+import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+import { auth } from '@/auth'
+
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+    const session = await auth()
+    if (!session || (session.user as { role: string }).role !== 'ADMIN')
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+
+    const { id } = await params
+    const body = await req.json()
+    const { status, observacoes } = body
+
+    const allowed = ['RASCUNHO', 'CONFIRMADA', 'CANCELADA']
+    if (status && !allowed.includes(status))
+        return NextResponse.json({ error: 'Status inv\u00e1lido' }, { status: 400 })
+
+    const updated = await prisma.producao.update({
+        where: { id },
+        data: {
+            ...(status && { status }),
+            ...(observacoes !== undefined && { observacoes }),
+        },
+    })
+    return NextResponse.json(updated)
+}

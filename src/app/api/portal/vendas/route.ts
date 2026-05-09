@@ -15,10 +15,11 @@ export async function POST(req: Request) {
     const parceiroId = user.parceiroId
 
     const body = await req.json()
-    const { produtoId, quantidade } = body as { produtoId: string; quantidade: number }
+    const { produtoId, quantidade, dataVenda } = body as { produtoId: string; quantidade: number; dataVenda?: string }
     if (!produtoId || !quantidade || quantidade <= 0)
         return NextResponse.json({ error: 'Produto e quantidade são obrigatórios' }, { status: 400 })
 
+    const vendaDate = dataVenda ? new Date(dataVenda) : new Date()
     // Validate partner has enough consigned stock
     const estoque = await prisma.estoqueConsignado.findUnique({
         where: { parceiroId_produtoId: { parceiroId, produtoId } },
@@ -34,8 +35,8 @@ export async function POST(req: Request) {
     })
 
     const now = new Date()
-    const mes = now.getMonth() + 1
-    const ano = now.getFullYear()
+    const mes = (vendaDate || now).getMonth() + 1
+    const ano = (vendaDate || now).getFullYear()
     const vlr = Number(estoque.produto.precoPadrao)
     const comissaoPct = Number(parceiro?.percentualComissao ?? 0)
 
@@ -106,6 +107,7 @@ export async function POST(req: Request) {
                     valorTotal: (vlr * quantidade) as unknown as Decimal,
                     valorComissao: valorComissao as unknown as Decimal,
                     valorRepasse: valorRepasse as unknown as Decimal,
+                    dataVenda: vendaDate,
                 },
             })
         }

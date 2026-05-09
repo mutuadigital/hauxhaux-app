@@ -24,6 +24,9 @@ export default function RemessasPage() {
     const [expandedId, setExpandedId] = useState<string | null>(null)
     const [form, setForm] = useState({ parceiroId: '', dataEnvio: new Date().toISOString().split('T')[0], observacoes: '' })
     const [itens, setItens] = useState<RemessaItem[]>([{ produtoId: '', quantidade: 1, valorReferencia: '' }])
+    const [editando, setEditando] = useState<Remessa | null>(null)
+    const [editForm, setEditForm] = useState({ dataEnvio: '', observacoes: '' })
+    const [editSaving, setEditSaving] = useState(false)
 
     const load = useCallback(async () => {
         setLoading(true)
@@ -64,6 +67,19 @@ export default function RemessasPage() {
         setSaving(false); setShowModal(false); load()
     }
 
+    async function salvarEdicao() {
+        if (!editando) return
+        setEditSaving(true)
+        await fetch(`/api/consignacao/remessas/${editando.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ dataEnvio: editForm.dataEnvio, observacoes: editForm.observacoes || null }),
+        })
+        setEditSaving(false)
+        setEditando(null)
+        load()
+    }
+
     return (
         <div className="page-body anim-fade-in">
             <div className="page-header">
@@ -93,8 +109,15 @@ export default function RemessasPage() {
                                             <td className="font-medium">{r.parceiro.nome}</td>
                                             <td className="text-sm">{new Date(r.dataEnvio).toLocaleDateString('pt-BR')}</td>
                                             <td><span className="badge badge-neutral">{r.itens.length} produto(s)</span></td>
-                                            <td><span className="badge badge-success">{r.status}</span></td>
-                                            <td className="text-muted text-sm">{expandedId === r.id ? '▲' : '▼'}</td>
+                                            <td><span className={`badge ${r.status === 'CONFIRMADA' ? 'badge-success' : r.status === 'CANCELADA' ? 'badge-danger' : 'badge-warning'}`}>{r.status}</span></td>
+                                            <td onClick={e => e.stopPropagation()}>
+                                                <div className="table-actions">
+                                                    <span className="text-muted text-sm">{expandedId === r.id ? '▲' : '▼'}</span>
+                                                    <button className="btn-icon" title="Editar" onClick={() => { setEditando(r); setEditForm({ dataEnvio: new Date(r.dataEnvio).toISOString().split('T')[0], observacoes: '' }) }}>
+                                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                                                    </button>
+                                                </div>
+                                            </td>
                                         </tr>
                                         {expandedId === r.id && (
                                             <tr key={`${r.id}-d`}>
@@ -194,6 +217,42 @@ export default function RemessasPage() {
                             <button className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancelar</button>
                             <button className="btn btn-primary" onClick={save} disabled={saving || !form.parceiroId} id="btn-salvar-remessa">
                                 {saving ? 'Registrando...' : '🚚 Registrar Remessa'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Edit Modal */}
+            {editando && (
+                <div className="modal-backdrop" onClick={e => e.target === e.currentTarget && setEditando(null)}>
+                    <div className="modal" role="dialog">
+                        <div className="modal-header">
+                            <h2 className="modal-title">Editar Remessa</h2>
+                            <button className="btn-icon" onClick={() => setEditando(null)}>✕</button>
+                        </div>
+                        <div className="modal-body">
+                            <div style={{ padding: 'var(--space-3)', background: 'rgba(197,160,89,0.08)', borderRadius: 'var(--radius)', marginBottom: 'var(--space-4)', fontSize: 'var(--text-sm)' }}>
+                                <strong>{editando.parceiro.nome}</strong> · {editando.itens.length} produto(s)
+                            </div>
+                            <div className="form-grid form-grid-2" style={{ gap: 'var(--space-4)' }}>
+                                <div className="form-group">
+                                    <label className="form-label required">Data de envio</label>
+                                    <input className="form-control" type="date" value={editForm.dataEnvio}
+                                        onChange={e => setEditForm(f => ({ ...f, dataEnvio: e.target.value }))} autoFocus />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Observações</label>
+                                    <input className="form-control" value={editForm.observacoes}
+                                        onChange={e => setEditForm(f => ({ ...f, observacoes: e.target.value }))}
+                                        placeholder="Opcional" />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="modal-footer">
+                            <button className="btn btn-secondary" onClick={() => setEditando(null)}>Cancelar</button>
+                            <button className="btn btn-primary" onClick={salvarEdicao} disabled={editSaving || !editForm.dataEnvio}>
+                                {editSaving ? 'Salvando...' : 'Salvar'}
                             </button>
                         </div>
                     </div>

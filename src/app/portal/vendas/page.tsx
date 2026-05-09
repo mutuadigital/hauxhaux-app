@@ -36,6 +36,7 @@ export default function PortalVendasPage() {
     const [saving, setSaving] = useState(false)
     const [produtoId, setProdutoId] = useState('')
     const [quantidade, setQuantidade] = useState(1)
+    const [dataVenda, setDataVenda] = useState(new Date().toISOString().split('T')[0])
     const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; msg: string } | null>(null)
 
     const load = useCallback(async () => {
@@ -61,7 +62,7 @@ export default function PortalVendasPage() {
         const res = await fetch('/api/portal/vendas', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ produtoId, quantidade }),
+            body: JSON.stringify({ produtoId, quantidade, dataVenda }),
         })
         setSaving(false)
         if (!res.ok) {
@@ -99,6 +100,17 @@ export default function PortalVendasPage() {
                                 {feedback.type === 'success' ? '✅' : '❌'} {feedback.msg}
                             </div>
                         )}
+
+                        <div className="form-group" style={{ marginBottom: 'var(--space-4)' }}>
+                                <label className="form-label required" style={{ fontSize: 'var(--text-base)' }}>Data da venda</label>
+                                <input
+                                    className="form-control"
+                                    type="date"
+                                    value={dataVenda}
+                                    onChange={e => setDataVenda(e.target.value)}
+                                    style={{ fontSize: 'var(--text-base)', height: 48 }}
+                                />
+                            </div>
 
                         <div className="form-group" style={{ marginBottom: 'var(--space-5)' }}>
                             <label className="form-label required" style={{ fontSize: 'var(--text-base)' }}>Produto</label>

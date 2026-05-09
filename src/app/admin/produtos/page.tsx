@@ -9,6 +9,7 @@ type Produto = {
     nome: string
     unidadeMedida: string
     precoPadrao: number
+    custoRef?: number | null
     estoqueMinimo: number
     ativo: boolean
     categoria?: { nome: string } | null
@@ -45,7 +46,7 @@ export default function ProdutosPage() {
     function openCreate() { setEditing(null); setForm(defaultForm); setShowModal(true) }
     function openEdit(p: Produto) {
         setEditing(p)
-        setForm({ codigo: p.codigo, nome: p.nome, categoriaId: '', unidadeMedida: p.unidadeMedida, precoPadrao: p.precoPadrao.toString(), custoRef: '', estoqueMinimo: p.estoqueMinimo.toString(), observacoes: '' })
+        setForm({ codigo: p.codigo, nome: p.nome, categoriaId: '', unidadeMedida: p.unidadeMedida, precoPadrao: p.precoPadrao.toString(), custoRef: p.custoRef != null ? p.custoRef.toString() : '', estoqueMinimo: p.estoqueMinimo.toString(), observacoes: '' })
         setShowModal(true)
     }
     async function save() {

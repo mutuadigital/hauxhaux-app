@@ -7,6 +7,7 @@ const portalNav = [
     { href: '/portal', label: '🏠 Início', exact: true },
     { href: '/portal/estoque', label: '📦 Meu Estoque' },
     { href: '/portal/vendas', label: '🛒 Registrar Venda' },
+    { href: '/portal/minhas-vendas', label: '📊 Minhas Vendas' },
     { href: '/portal/historico', label: '📋 Histórico' },
 ]
 

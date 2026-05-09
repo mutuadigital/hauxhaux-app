@@ -573,6 +573,9 @@ model FechamentoItem {
   valorTotal          Decimal @db.Decimal(10, 2)
   valorComissao       Decimal @default(0) @db.Decimal(10, 2)
   valorRepasse        Decimal @default(0) @db.Decimal(10, 2)
+  dataVenda           DateTime?
+  excluido            Boolean  @default(false)
+  excluidoEm          DateTime?
 
   fechamento Fechamento @relation(fields: [fechamentoId], references: [id], onDelete: Cascade)
   produto    Produto    @relation(fields: [produtoId], references: [id])

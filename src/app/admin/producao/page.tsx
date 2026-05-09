@@ -141,7 +141,16 @@ export default function ProducaoPage() {
                                                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
                                                     </button>
                                                     {p.status === 'RASCUNHO' && (
-                                                        <button className="btn btn-sm btn-primary" style={{ fontSize: 11 }} onClick={() => openConfirm(p)} id={`btn-confirmar-${p.id}`}>Confirmar</button>
+                                                        <>
+                                                            <button className="btn btn-sm btn-primary" style={{ fontSize: 11 }} onClick={() => openConfirm(p)} id={`btn-confirmar-${p.id}`}>Confirmar</button>
+                                                            <button className="btn-icon" title="Cancelar" style={{ color: 'var(--color-danger)' }} onClick={async () => {
+                                                                if (!confirm('Cancelar esta produção?')) return
+                                                                await fetch(`/api/producao/${p.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'CANCELADA' }) })
+                                                                load()
+                                                            }}>
+                                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></svg>
+                                                            </button>
+                                                        </>
                                                     )}
                                                 </div>
                                             </td>

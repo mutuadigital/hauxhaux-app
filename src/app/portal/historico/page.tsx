@@ -37,7 +37,11 @@ export default async function PortalHistoricoPage() {
             where: { parceiroId },
             orderBy: [{ competenciaAno: 'desc' }, { competenciaMes: 'desc' }],
             include: {
-                itens: { include: { produto: { select: { nome: true, unidadeMedida: true } } } },
+                itens: { 
+                    where: { excluido: false },
+                    include: { produto: { select: { nome: true, unidadeMedida: true } } },
+                    orderBy: { dataVenda: 'asc' },
+                },
                 contasReceber: { select: { status: true, valorTotal: true, saldoAberto: true } },
             },
         }),
