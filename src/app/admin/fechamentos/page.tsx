@@ -196,7 +196,7 @@ export default function FechamentosPage() {
                                                     {f.totalValor != null ? `R$ ${Number(f.totalValor).toFixed(2)}` : '—'}
                                                 </td>
                                                 <td className="font-medium" style={{ color: 'var(--color-accent)' }}>
-                                                    {f.itens.length > 0 ? `R$ ${f.itens.reduce((s, i) => s + Number(i.valorRepasse || 0), 0).toFixed(2)}` : '—'}
+                                                    {f.itens.length > 0 ? `R$ ${f.itens.reduce((s, i) => s + Number((i as any).valorRepasse || 0), 0).toFixed(2)}` : '—'}
                                                 </td>
                                                 <td><span className={`badge ${statusBadge[f.status] ?? 'badge-neutral'}`}>{f.status}</span></td>
                                                 <td>
@@ -244,7 +244,7 @@ export default function FechamentosPage() {
                                                                         <td className="text-sm">{String(Number(Math.max(0, Number(item.saldoInicial) - Number(item.quantidadeConsumida))).toFixed(3))}</td>
                                                                         <td className="text-sm">R$ {Number(item.valorUnitario).toFixed(2)}</td>
                                                                         <td className="font-medium">R$ {Number(item.valorTotal).toFixed(2)}</td>
-                                                                        <td className="font-medium" style={{ color: 'var(--color-accent)' }}>R$ {Number(item.valorRepasse || 0).toFixed(2)}</td>
+                                                                        <td className="font-medium" style={{ color: 'var(--color-accent)' }}>R$ {Number((item as any).valorRepasse || 0).toFixed(2)}</td>
                                                                     </tr>
                                                                 ))}
                                                             </tbody>
