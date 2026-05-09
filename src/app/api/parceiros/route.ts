@@ -26,11 +26,11 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
     const body = await req.json()
-    const { nome, nomeFantasia, documento, contatoPrincipal, telefone, email, endereco, cidade, estado, observacoes, percentualComissao } = body
+    const { nome, nomeFantasia, documento, contatoPrincipal, telefone, email, cep, endereco, cidade, estado, observacoes, percentualComissao } = body
     if (!nome) return NextResponse.json({ error: 'nome é obrigatório' }, { status: 400 })
 
     const record = await prisma.parceiro.create({
-        data: { nome, nomeFantasia, documento, contatoPrincipal, telefone, email, endereco, cidade, estado, observacoes, percentualComissao: parseFloat(percentualComissao) || 0 },
+        data: { nome, nomeFantasia, documento, contatoPrincipal, telefone, email, cep, endereco, cidade, estado, observacoes, percentualComissao: parseFloat(percentualComissao) || 0 },
     })
     return NextResponse.json(record, { status: 201 })
 }

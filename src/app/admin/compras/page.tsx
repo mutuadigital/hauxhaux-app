@@ -34,6 +34,12 @@ export default function ComprasPage() {
 
     useEffect(() => { load() }, [load])
 
+    async function removeCompra(id: string) {
+        if (!confirm('Excluir esta compra? Esta ação não pode ser desfeita.')) return
+        await fetch(`/api/compras/${id}`, { method: 'DELETE' })
+        load()
+    }
+
     function addItem() {
         setItens(i => [...i, { insumoId: '', nome: '', unidade: '', quantidade: 1, valorUnit: '', valorTotal: 0 }])
     }
@@ -104,7 +110,14 @@ export default function ComprasPage() {
                                             <td className="text-sm text-muted">{c.documentoRef || '—'}</td>
                                             <td><span className="badge badge-neutral">{c.itens.length} item(s)</span></td>
                                             <td className="font-medium text-accent">R$ {Number(c.valorTotal).toFixed(2)}</td>
-                                            <td><span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--text-sm)' }}>{expandedId === c.id ? '▲' : '▼'}</span></td>
+                                            <td onClick={e => e.stopPropagation()}>
+                                                <div className="table-actions">
+                                                    <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--text-sm)', marginRight: 8 }}>{expandedId === c.id ? '▲' : '▼'}</span>
+                                                    <button className="btn-icon" title="Excluir" onClick={() => removeCompra(c.id)} style={{ color: 'var(--color-danger)' }}>
+                                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /></svg>
+                                                    </button>
+                                                </div>
+                                            </td>
                                         </tr>
                                         {expandedId === c.id && (
                                             <tr key={`${c.id}-detail`}>

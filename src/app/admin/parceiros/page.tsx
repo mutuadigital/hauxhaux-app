@@ -10,6 +10,8 @@ type Parceiro = {
     contatoPrincipal?: string | null
     telefone?: string | null
     email?: string | null
+    cep?: string | null
+    endereco?: string | null
     cidade?: string | null
     estado?: string | null
     status: string
@@ -23,7 +25,7 @@ const statusBadge: Record<string, string> = {
     ENCERRADO: 'badge-danger',
 }
 
-const defaultForm = { nome: '', nomeFantasia: '', documento: '', contatoPrincipal: '', telefone: '', email: '', endereco: '', cidade: '', estado: '', observacoes: '', percentualComissao: '0' }
+const defaultForm = { nome: '', nomeFantasia: '', documento: '', contatoPrincipal: '', telefone: '', email: '', cep: '', endereco: '', cidade: '', estado: '', observacoes: '', percentualComissao: '0' }
 
 export default function ParceirosPage() {
     const [parceiros, setParceiros] = useState<Parceiro[]>([])
@@ -49,7 +51,7 @@ export default function ParceirosPage() {
     }
     function openEdit(p: Parceiro) {
         setEditing(p)
-        setForm({ nome: p.nome, nomeFantasia: p.nomeFantasia ?? '', documento: p.documento ?? '', contatoPrincipal: p.contatoPrincipal ?? '', telefone: p.telefone ?? '', email: p.email ?? '', endereco: '', cidade: p.cidade ?? '', estado: p.estado ?? '', observacoes: '', percentualComissao: String(p.percentualComissao ?? 0) })
+        setForm({ nome: p.nome, nomeFantasia: p.nomeFantasia ?? '', documento: p.documento ?? '', contatoPrincipal: p.contatoPrincipal ?? '', telefone: p.telefone ?? '', email: p.email ?? '', cep: p.cep ?? '', endereco: p.endereco ?? '', cidade: p.cidade ?? '', estado: p.estado ?? '', observacoes: '', percentualComissao: String(p.percentualComissao ?? 0) })
         setShowModal(true)
     }
     async function save() {
@@ -182,6 +184,14 @@ export default function ParceirosPage() {
                                 <div className="form-group">
                                     <label className="form-label">E-mail</label>
                                     <input className="form-control" type="email" value={form.email} onChange={f('email')} placeholder="email@exemplo.com" />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">CEP</label>
+                                    <input className="form-control" value={form.cep} onChange={f('cep')} placeholder="00000-000" maxLength={9} />
+                                </div>
+                                <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                                    <label className="form-label">Endereço completo</label>
+                                    <input className="form-control" value={form.endereco} onChange={f('endereco')} placeholder="Rua, número, bairro..." />
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Cidade</label>

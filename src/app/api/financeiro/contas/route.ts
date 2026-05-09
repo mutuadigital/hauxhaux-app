@@ -11,9 +11,17 @@ export async function GET() {
         orderBy: { dataEmissao: 'desc' },
         include: {
             parceiro: { select: { nome: true } },
+            vendaDireta: { select: { clienteNome: true } },
             recebimentos: true,
         },
         take: 200,
     })
-    return NextResponse.json(contas)
+
+    // Normalize: garante que parceiro nunca é null no client
+    const normalized = contas.map((c) => ({
+        ...c,
+        parceiro: c.parceiro ?? { nome: c.vendaDireta?.clienteNome ?? 'Venda Direta' },
+    }))
+
+    return NextResponse.json(normalized)
 }

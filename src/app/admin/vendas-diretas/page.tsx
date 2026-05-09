@@ -94,6 +94,12 @@ export default function VendasDiretasPage() {
         setShowModal(false); load()
     }
 
+    async function removeVenda(id: string) {
+        if (!confirm('Excluir esta venda? A cobrança associada será cancelada.')) return
+        await fetch(`/api/vendas-diretas/${id}`, { method: 'DELETE' })
+        load()
+    }
+
     return (
         <div className="page-body anim-fade-in">
             <div className="page-header">
@@ -117,7 +123,7 @@ export default function VendasDiretasPage() {
                         <div className="empty-state"><div className="empty-state-icon">🛍</div><div className="empty-state-title">Nenhuma venda direta</div><div className="empty-state-desc">Registre vendas realizadas diretamente a clientes finais.</div></div>
                     ) : (
                         <table className="table">
-                            <thead><tr><th style={{ width: 28 }} /><th>Data</th><th>Cliente</th><th>Produtos</th><th>Total</th><th>Cobrança</th></tr></thead>
+                            <thead><tr><th style={{ width: 28 }} /><th>Data</th><th>Cliente</th><th>Produtos</th><th>Total</th><th>Cobrança</th><th style={{ width: 60 }}>Ações</th></tr></thead>
                             <tbody>
                                 {vendas.map(v => {
                                     const expanded = expandedId === v.id
@@ -136,6 +142,11 @@ export default function VendasDiretasPage() {
                                                             {conta.status.replace('_', ' ')} — R$ {Number(conta.saldoAberto).toFixed(2)}
                                                         </span>
                                                     ) : <span className="text-muted text-xs">—</span>}
+                                                </td>
+                                                <td onClick={e => e.stopPropagation()}>
+                                                    <button className="btn-icon" title="Excluir" onClick={() => removeVenda(v.id)} style={{ color: 'var(--color-danger)' }}>
+                                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /></svg>
+                                                    </button>
                                                 </td>
                                             </tr>
                                             {expanded && (

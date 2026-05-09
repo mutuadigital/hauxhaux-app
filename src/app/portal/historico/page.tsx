@@ -16,14 +16,7 @@ export default async function PortalHistoricoPage() {
     if (!user?.parceiroId) redirect('/portal')
     const parceiroId = user.parceiroId
 
-    const [declaracoes, remessas, devolucoes, fechamentos] = await Promise.all([
-        prisma.declaracaoConsumo.findMany({
-            where: { parceiroId },
-            orderBy: [{ competenciaAno: 'desc' }, { competenciaMes: 'desc' }],
-            include: {
-                itens: { include: { produto: { select: { nome: true, unidadeMedida: true } } } },
-            },
-        }),
+    const [remessas, devolucoes, fechamentos] = await Promise.all([
         prisma.remessaConsignacao.findMany({
             where: { parceiroId },
             orderBy: { dataEnvio: 'desc' },
@@ -44,6 +37,7 @@ export default async function PortalHistoricoPage() {
             where: { parceiroId },
             orderBy: [{ competenciaAno: 'desc' }, { competenciaMes: 'desc' }],
             include: {
+                itens: { include: { produto: { select: { nome: true, unidadeMedida: true } } } },
                 contasReceber: { select: { status: true, valorTotal: true, saldoAberto: true } },
             },
         }),
@@ -51,9 +45,6 @@ export default async function PortalHistoricoPage() {
 
     const meses = ['', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
 
-    const statusDeclaracaoBadge: Record<string, string> = {
-        RASCUNHO: 'badge-neutral', ENVIADO: 'badge-info', VALIDADO: 'badge-success', INCORPORADO_NO_FECHAMENTO: 'badge-accent',
-    }
     const statusFechamentoBadge: Record<string, string> = {
         ABERTO: 'badge-warning', EM_VALIDACAO: 'badge-info', FECHADO: 'badge-success', CANCELADO: 'badge-danger',
     }
@@ -116,49 +107,6 @@ export default async function PortalHistoricoPage() {
                                             </tr>
                                         )
                                     })}
-                                </tbody>
-                            </table>
-                        )}
-                    </div>
-                </div>
-
-                {/* Declarações de consumo */}
-                <div className="card">
-                    <div className="card-header">
-                        <h3 className="card-title">📝 Declarações de Consumo</h3>
-                    </div>
-                    <div className="table-wrapper">
-                        {declaracoes.length === 0 ? (
-                            <div className="empty-state" style={{ padding: 'var(--space-8)' }}>
-                                <div className="empty-state-desc">Nenhuma declaração registrada</div>
-                            </div>
-                        ) : (
-                            <table className="table">
-                                <thead>
-                                    <tr>
-                                        <th>Competência</th>
-                                        <th>Status</th>
-                                        <th>Produtos</th>
-                                        <th>Enviado em</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {declaracoes.map((d) => (
-                                        <tr key={d.id}>
-                                            <td className="font-medium">{meses[d.competenciaMes]}/{d.competenciaAno}</td>
-                                            <td><span className={`badge ${statusDeclaracaoBadge[d.status] ?? 'badge-neutral'}`}>{d.status.replace(/_/g, ' ')}</span></td>
-                                            <td>
-                                                <div style={{ fontSize: 'var(--text-xs)', lineHeight: 1.6 }}>
-                                                    {d.itens.map((it, i) => (
-                                                        <div key={i}>• {it.produto.nome}: {Number(it.quantidadeConsumida).toFixed(3)} {it.produto.unidadeMedida}</div>
-                                                    ))}
-                                                </div>
-                                            </td>
-                                            <td className="text-sm text-muted">
-                                                {d.enviadoEm ? new Date(d.enviadoEm).toLocaleDateString('pt-BR') : '—'}
-                                            </td>
-                                        </tr>
-                                    ))}
                                 </tbody>
                             </table>
                         )}
