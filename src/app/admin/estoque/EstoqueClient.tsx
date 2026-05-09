@@ -58,6 +58,34 @@ export default function EstoqueClient({ produtos, insumos, consignado, parceiros
                     <h1 className="page-header-title">Estoque</h1>
                     <p className="page-header-sub">Saldos de produtos, insumos e itens consignados</p>
                 </div>
+                <div className="page-actions">
+                    <button 
+                        className="btn btn-secondary" 
+                        onClick={async () => {
+                            if (!confirm('Deseja recalcular o estoque de todos os produtos com base no histórico de vendas e produções?')) return;
+                            try {
+                                const btn = document.getElementById('btn-recalc');
+                                if (btn) btn.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px;"></span> Recalculando...';
+                                const res = await fetch('/api/admin/recalc-estoque');
+                                const data = await res.json();
+                                if (data.ok) {
+                                    alert('Estoque reconciliado com sucesso!');
+                                    window.location.reload();
+                                } else {
+                                    alert('Erro: ' + data.error);
+                                }
+                            } catch (e: any) {
+                                alert('Erro: ' + e.message);
+                            } finally {
+                                const btn = document.getElementById('btn-recalc');
+                                if (btn) btn.innerHTML = '🔄 Reconciliar Estoque';
+                            }
+                        }}
+                        id="btn-recalc"
+                    >
+                        🔄 Reconciliar Estoque
+                    </button>
+                </div>
             </div>
 
             {/* KPIs */}
