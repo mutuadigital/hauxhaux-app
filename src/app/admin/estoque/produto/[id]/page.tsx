@@ -17,13 +17,14 @@ export default async function EstoqueProdutoDetailPage({ params }: { params: Pro
     const produto = await prisma.produto.findUnique({
         where: { id },
         include: {
+            categoria: { select: { nome: true } },
             estoque: true,
             producoes: {
                 orderBy: { dataProducao: 'desc' },
                 take: 10,
                 include: { produto: { select: { unidadeMedida: true } } },
             },
-            remessasConsignacao: {
+            remessasItens: {
                 orderBy: { remessa: { dataEnvio: 'desc' } },
                 take: 15,
                 include: { remessa: { select: { dataEnvio: true, parceiro: { select: { nome: true } } } } },
@@ -53,7 +54,7 @@ export default async function EstoqueProdutoDetailPage({ params }: { params: Pro
                     <h1 className="page-header-title">{produto.nome}</h1>
                     <p className="page-header-sub">
                         {produto.codigo && <span>{produto.codigo} · </span>}
-                        {produto.unidadeMedida} · {produto.categoria ? produto.categoria : 'Sem categoria'}
+                        {produto.unidadeMedida} · {produto.categoria ? produto.categoria.nome : 'Sem categoria'}
                     </p>
                 </div>
             </div>
@@ -154,7 +155,7 @@ export default async function EstoqueProdutoDetailPage({ params }: { params: Pro
                     <div className="card">
                         <div className="card-header"><h3 className="card-title">🚚 Histórico de Remessas</h3></div>
                         <div className="table-wrapper">
-                            {produto.remessasConsignacao.length === 0 ? (
+                            {produto.remessasItens.length === 0 ? (
                                 <div className="empty-state" style={{ padding: 'var(--space-6)' }}>
                                     <div className="empty-state-desc">Nenhuma remessa registrada</div>
                                 </div>
@@ -162,7 +163,7 @@ export default async function EstoqueProdutoDetailPage({ params }: { params: Pro
                                 <table className="table">
                                     <thead><tr><th>Data</th><th>Parceiro</th><th>Qtd.</th></tr></thead>
                                     <tbody>
-                                        {produto.remessasConsignacao.map(i => (
+                                        {produto.remessasItens.map(i => (
                                             <tr key={i.id}>
                                                 <td className="text-sm">{new Date(i.remessa.dataEnvio).toLocaleDateString('pt-BR')}</td>
                                                 <td className="font-medium">{i.remessa.parceiro.nome}</td>
