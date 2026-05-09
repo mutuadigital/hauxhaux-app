@@ -174,7 +174,8 @@ export default function FechamentosPage() {
                                     <th>Parceiro</th>
                                     <th>Competência</th>
                                     <th>Qtd. Vendida</th>
-                                    <th>Total</th>
+                                    <th>Total Vendas</th>
+                                    <th>Repasse (Líquido)</th>
                                     <th>Status</th>
                                     <th>Cobrança</th>
                                     <th style={{ width: 90 }}>Ações</th>
@@ -191,8 +192,11 @@ export default function FechamentosPage() {
                                                 <td className="font-medium">{f.parceiro.nome}</td>
                                                 <td><span className="badge badge-neutral">{meses[f.competenciaMes]}/{f.competenciaAno}</span></td>
                                                 <td className="text-sm">{f.totalQuantidade != null ? Number(f.totalQuantidade).toFixed(3) : '—'}</td>
-                                                <td className="font-medium" style={{ color: 'var(--color-accent)' }}>
+                                                <td className="font-medium">
                                                     {f.totalValor != null ? `R$ ${Number(f.totalValor).toFixed(2)}` : '—'}
+                                                </td>
+                                                <td className="font-medium" style={{ color: 'var(--color-accent)' }}>
+                                                    {f.itens.length > 0 ? `R$ ${f.itens.reduce((s, i) => s + Number(i.valorRepasse || 0), 0).toFixed(2)}` : '—'}
                                                 </td>
                                                 <td><span className={`badge ${statusBadge[f.status] ?? 'badge-neutral'}`}>{f.status}</span></td>
                                                 <td>
@@ -224,7 +228,8 @@ export default function FechamentosPage() {
                                                                     <th>Qtd. Vendida</th>
                                                                     <th>Saldo Final</th>
                                                                     <th>Vlr. Unit.</th>
-                                                                    <th>Total</th>
+                                                                    <th>Venda Total</th>
+                                                                    <th>Repasse</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
@@ -239,6 +244,7 @@ export default function FechamentosPage() {
                                                                         <td className="text-sm">{String(Number(Math.max(0, Number(item.saldoInicial) - Number(item.quantidadeConsumida))).toFixed(3))}</td>
                                                                         <td className="text-sm">R$ {Number(item.valorUnitario).toFixed(2)}</td>
                                                                         <td className="font-medium">R$ {Number(item.valorTotal).toFixed(2)}</td>
+                                                                        <td className="font-medium" style={{ color: 'var(--color-accent)' }}>R$ {Number(item.valorRepasse || 0).toFixed(2)}</td>
                                                                     </tr>
                                                                 ))}
                                                             </tbody>

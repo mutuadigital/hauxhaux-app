@@ -81,7 +81,7 @@ export default function FinanceiroPage() {
                         <div className="empty-state"><div className="empty-state-icon">💰</div><div className="empty-state-title">Nenhuma conta a receber</div></div>
                     ) : (
                         <table className="table">
-                            <thead><tr><th>Parceiro</th><th>Descrição</th><th>Emissão</th><th>Vencimento</th><th>Total</th><th>Saldo</th><th>Status</th><th style={{ width: 80 }}>Ações</th></tr></thead>
+                            <thead><tr><th>Parceiro</th><th>Descrição</th><th>Emissão</th><th>Vencimento</th><th>Venda Total</th><th>Repasse (Líquido)</th><th>Saldo a Pagar</th><th>Status</th><th style={{ width: 80 }}>Ações</th></tr></thead>
                             <tbody>
                                 {contas.map((c) => (
                                     <>
@@ -91,6 +91,7 @@ export default function FinanceiroPage() {
                                             <td className="text-sm">{new Date(c.dataEmissao).toLocaleDateString('pt-BR')}</td>
                                             <td className="text-sm">{c.dataVencimento ? new Date(c.dataVencimento).toLocaleDateString('pt-BR') : <span className="text-muted">—</span>}</td>
                                             <td className="font-medium">R$ {Number(c.valorTotal).toFixed(2)}</td>
+                                            <td className="font-medium" style={{ color: 'var(--color-info)' }}>R$ {Number((c as any).valorRepasse || c.valorTotal).toFixed(2)}</td>
                                             <td className="font-medium" style={{ color: Number(c.saldoAberto) > 0 ? 'var(--color-danger)' : 'var(--color-success)' }}>
                                                 R$ {Number(c.saldoAberto).toFixed(2)}
                                             </td>

@@ -80,7 +80,8 @@ export default async function PortalHistoricoPage() {
                                     <tr>
                                         <th>Competência</th>
                                         <th>Status</th>
-                                        <th>Total</th>
+                                        <th>Total Vendas</th>
+                                        <th>Repasse (Líquido)</th>
                                         <th>Cobrança</th>
                                     </tr>
                                 </thead>
@@ -91,8 +92,11 @@ export default async function PortalHistoricoPage() {
                                             <tr key={f.id}>
                                                 <td className="font-medium">{meses[f.competenciaMes]}/{f.competenciaAno}</td>
                                                 <td><span className={`badge ${statusFechamentoBadge[f.status] ?? 'badge-neutral'}`}>{f.status}</span></td>
-                                                <td className="font-medium" style={{ color: 'var(--color-accent)' }}>
+                                                <td className="font-medium">
                                                     {f.totalValor ? `R$ ${Number(f.totalValor).toFixed(2)}` : '—'}
+                                                </td>
+                                                <td className="font-medium" style={{ color: 'var(--color-accent)' }}>
+                                                    {f.itens.length > 0 ? `R$ ${f.itens.reduce((s, i) => s + Number((i as any).valorRepasse || 0), 0).toFixed(2)}` : '—'}
                                                 </td>
                                                 <td>
                                                     {conta ? (
