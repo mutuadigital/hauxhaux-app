@@ -40,3 +40,7 @@ deploy*.log
 
 # Gemini AI
 .gemini/
+
+# Credenciais de acesso (nunca commitar!)
+.env.credentials
+ACESSO_SERVIDOR.md
