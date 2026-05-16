@@ -12,6 +12,7 @@ export async function GET() {
     const vendas = await prisma.vendaDireta.findMany({
         orderBy: { dataVenda: 'desc' },
         include: {
+            cliente: { select: { id: true, nome: true, documento: true } },
             itens: { include: { produto: { select: { nome: true, unidadeMedida: true } } } },
             contasReceber: { select: { id: true, status: true, saldoAberto: true } },
         },
@@ -25,26 +26,29 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
     const body = await req.json()
-    const { dataVenda, clienteNome, clienteDoc, observacoes, itens } = body as {
-        dataVenda?: string
-        clienteNome?: string
-        clienteDoc?: string
-        observacoes?: string
+    const { dataVenda, clienteId, clienteNome, clienteDoc, observacoes, desconto, valorFrete, itens } = body as {
+        dataVenda?: string; clienteId?: string; clienteNome?: string; clienteDoc?: string
+        observacoes?: string; desconto?: number; valorFrete?: number
         itens: { produtoId: string; quantidade: number; valorUnit: number }[]
     }
 
     const validItems = (itens ?? []).filter(i => i.produtoId && i.quantidade > 0 && i.valorUnit >= 0)
     if (!validItems.length) return NextResponse.json({ error: 'Informe pelo menos um produto' }, { status: 400 })
 
-    const valorTotal = validItems.reduce((s, i) => s + i.quantidade * i.valorUnit, 0)
+    const subtotal = validItems.reduce((s, i) => s + i.quantidade * i.valorUnit, 0)
+    const descontoVal = Math.max(0, desconto ?? 0)
+    const freteVal = Math.max(0, valorFrete ?? 0)
+    const valorTotal = subtotal - descontoVal + freteVal
 
     const venda = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-        // Create venda
         const v = await tx.vendaDireta.create({
             data: {
                 dataVenda: dataVenda ? new Date(dataVenda) : new Date(),
+                clienteId: clienteId || null,
                 clienteNome: clienteNome || null,
                 clienteDoc: clienteDoc || null,
+                desconto: descontoVal as unknown as Decimal,
+                valorFrete: freteVal as unknown as Decimal,
                 valorTotal: valorTotal as unknown as Decimal,
                 observacoes: observacoes || null,
                 criadoPor: session.user?.id ?? null,
@@ -59,7 +63,6 @@ export async function POST(req: Request) {
             },
         })
 
-        // Deduct from EstoqueProduto (main internal stock)
         for (const item of validItems) {
             await tx.estoqueProduto.upsert({
                 where: { produtoId: item.produtoId },
@@ -68,8 +71,6 @@ export async function POST(req: Request) {
             })
         }
 
-
-        // Create ContaReceber — no commission for direct sales (valorRepasse = valorTotal)
         await tx.contaReceber.create({
             data: {
                 vendaDiretaId: v.id,

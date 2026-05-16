@@ -644,14 +644,18 @@ model Recebimento {
 model VendaDireta {
   id           String   @id @default(cuid())
   dataVenda    DateTime @default(now())
+  clienteId    String?
   clienteNome  String?
   clienteDoc   String?
+  desconto     Decimal  @default(0) @db.Decimal(10, 2)
+  valorFrete   Decimal  @default(0) @db.Decimal(10, 2)
   valorTotal   Decimal  @db.Decimal(10, 2)
   observacoes  String?
   criadoPor    String?
   criadoEm     DateTime @default(now())
   atualizadoEm DateTime @updatedAt
 
+  cliente       Cliente?        @relation(fields: [clienteId], references: [id])
   itens         VendaDiretaItem[]
   contasReceber ContaReceber[]
 
@@ -710,6 +714,29 @@ model SolicitacaoReposicaoItem {
   produto     Produto              @relation(fields: [produtoId], references: [id])
 
   @@map("solicitacoes_reposicao_itens")
+}
+
+// =============================================
+// CLIENTES (CRM)
+// =============================================
+
+model Cliente {
+  id           String   @id @default(cuid())
+  nome         String
+  documento    String?
+  telefone     String?
+  email        String?
+  endereco     String?
+  cidade       String?
+  estado       String?
+  observacoes  String?
+  ativo        Boolean  @default(true)
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  vendas VendaDireta[]
+
+  @@map("clientes")
 }
 
 // =============================================

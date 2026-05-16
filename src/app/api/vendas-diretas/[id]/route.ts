@@ -8,24 +8,13 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
     const { id } = await params
-
-    const venda = await prisma.vendaDireta.findUnique({
-        where: { id },
-        include: { itens: true },
-    })
+    const venda = await prisma.vendaDireta.findUnique({ where: { id }, include: { itens: true } })
     if (!venda) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
     await prisma.$transaction([
-        prisma.contaReceber.updateMany({
-            where: { vendaDiretaId: id },
-            data: { status: 'CANCELADO' },
-        }),
-        // Restore stock for each sold item
+        prisma.contaReceber.updateMany({ where: { vendaDiretaId: id }, data: { status: 'CANCELADO' } }),
         ...venda.itens.map((item) =>
-            prisma.estoqueProduto.update({
-                where: { produtoId: item.produtoId },
-                data: { quantidadeAtual: { increment: item.quantidade } },
-            })
+            prisma.estoqueProduto.update({ where: { produtoId: item.produtoId }, data: { quantidadeAtual: { increment: item.quantidade } } })
         ),
         prisma.vendaDireta.delete({ where: { id } }),
     ])
@@ -40,86 +29,66 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
     const { id } = await params
     const body = await req.json()
-    const { dataVenda, clienteNome, clienteDoc, observacoes, itens } = body as {
-        dataVenda?: string
-        clienteNome?: string
-        clienteDoc?: string
-        observacoes?: string
+    const { dataVenda, clienteId, clienteNome, clienteDoc, observacoes, desconto, valorFrete, itens } = body as {
+        dataVenda?: string; clienteId?: string; clienteNome?: string; clienteDoc?: string
+        observacoes?: string; desconto?: number; valorFrete?: number
         itens?: { produtoId: string; quantidade: number; valorUnit: number }[]
     }
 
-    const venda = await prisma.vendaDireta.findUnique({
-        where: { id },
-        include: { itens: true },
-    })
+    const venda = await prisma.vendaDireta.findUnique({ where: { id }, include: { itens: true } })
     if (!venda) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-    // If items are being updated, do full stock reconciliation
     if (itens && itens.length > 0) {
-        const novoTotal = itens.reduce((s, i) => s + i.quantidade * i.valorUnit, 0)
+        const subtotal = itens.reduce((s, i) => s + i.quantidade * i.valorUnit, 0)
+        const descontoVal = Math.max(0, desconto ?? Number(venda.desconto))
+        const freteVal = Math.max(0, valorFrete ?? Number(venda.valorFrete))
+        const novoTotal = subtotal - descontoVal + freteVal
 
         await prisma.$transaction(async (tx) => {
-            // 1. Restore stock from original items
             for (const oldItem of venda.itens) {
-                await tx.estoqueProduto.update({
-                    where: { produtoId: oldItem.produtoId },
-                    data: { quantidadeAtual: { increment: oldItem.quantidade } },
-                })
+                await tx.estoqueProduto.update({ where: { produtoId: oldItem.produtoId }, data: { quantidadeAtual: { increment: oldItem.quantidade } } })
             }
-
-            // 2. Delete old items
             await tx.vendaDiretaItem.deleteMany({ where: { vendaId: id } })
-
-            // 3. Create new items and deduct stock
             for (const item of itens) {
                 await tx.vendaDiretaItem.create({
-                    data: {
-                        vendaId: id,
-                        produtoId: item.produtoId,
-                        quantidade: item.quantidade,
-                        valorUnit: item.valorUnit,
-                        valorTotal: item.quantidade * item.valorUnit,
-                    },
+                    data: { vendaId: id, produtoId: item.produtoId, quantidade: item.quantidade, valorUnit: item.valorUnit, valorTotal: item.quantidade * item.valorUnit },
                 })
-                await tx.estoqueProduto.update({
-                    where: { produtoId: item.produtoId },
-                    data: { quantidadeAtual: { decrement: item.quantidade } },
-                })
+                await tx.estoqueProduto.update({ where: { produtoId: item.produtoId }, data: { quantidadeAtual: { decrement: item.quantidade } } })
             }
-
-            // 4. Update venda header + total
             await tx.vendaDireta.update({
                 where: { id },
                 data: {
-                    valorTotal: novoTotal,
+                    valorTotal: novoTotal, desconto: descontoVal, valorFrete: freteVal,
                     ...(dataVenda && { dataVenda: new Date(dataVenda) }),
+                    ...(clienteId !== undefined && { clienteId: clienteId || null }),
                     ...(clienteNome !== undefined && { clienteNome: clienteNome || null }),
                     ...(clienteDoc !== undefined && { clienteDoc: clienteDoc || null }),
                     ...(observacoes !== undefined && { observacoes: observacoes || null }),
                 },
             })
-
-            // 5. Update conta a receber to reflect new total
             await tx.contaReceber.updateMany({
                 where: { vendaDiretaId: id, status: { not: 'CANCELADO' } },
-                data: {
-                    valorTotal: novoTotal,
-                    valorRepasse: novoTotal,
-                    saldoAberto: novoTotal,
-                },
+                data: { valorTotal: novoTotal, valorRepasse: novoTotal, saldoAberto: novoTotal },
             })
         })
     } else {
-        // Header-only update
-        await prisma.vendaDireta.update({
-            where: { id },
-            data: {
-                ...(dataVenda && { dataVenda: new Date(dataVenda) }),
-                ...(clienteNome !== undefined && { clienteNome: clienteNome || null }),
-                ...(clienteDoc !== undefined && { clienteDoc: clienteDoc || null }),
-                ...(observacoes !== undefined && { observacoes: observacoes || null }),
-            },
-        })
+        const updateData: Record<string, unknown> = {}
+        if (dataVenda) updateData.dataVenda = new Date(dataVenda)
+        if (clienteId !== undefined) updateData.clienteId = clienteId || null
+        if (clienteNome !== undefined) updateData.clienteNome = clienteNome || null
+        if (clienteDoc !== undefined) updateData.clienteDoc = clienteDoc || null
+        if (observacoes !== undefined) updateData.observacoes = observacoes || null
+        if (desconto !== undefined) updateData.desconto = Math.max(0, desconto)
+        if (valorFrete !== undefined) updateData.valorFrete = Math.max(0, valorFrete)
+
+        if (desconto !== undefined || valorFrete !== undefined) {
+            const subtotal = venda.itens.reduce((s, i) => s + Number(i.valorTotal), 0)
+            const d = desconto !== undefined ? Math.max(0, desconto) : Number(venda.desconto)
+            const f = valorFrete !== undefined ? Math.max(0, valorFrete) : Number(venda.valorFrete)
+            updateData.valorTotal = subtotal - d + f
+        }
+
+        await prisma.vendaDireta.update({ where: { id }, data: updateData })
     }
 
     return NextResponse.json({ ok: true })

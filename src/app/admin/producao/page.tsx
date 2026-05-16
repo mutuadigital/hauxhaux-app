@@ -9,11 +9,14 @@ type ConsumoPrev = { insumoId: string; insumoNome: string; unidade: string; quan
 type Producao = {
     id: string
     codigoLote: string
+    produtoId: string
     produto: { nome: string; unidadeMedida: string }
     quantidadePrevista: number
     quantidadeRealizada?: number | null
     dataProducao: string
     status: 'RASCUNHO' | 'CONFIRMADA' | 'CANCELADA'
+    observacoes?: string | null
+    composicaoId?: string | null
     consumoInsumos: { insumo: { nome: string; unidadeMedida: string }; quantidadePrevista: number; quantidadeReal?: number | null }[]
 }
 
@@ -31,6 +34,7 @@ export default function ProducaoPage() {
     const [form, setForm] = useState({ produtoId: '', codigoLote: '', quantidadePrevista: '', dataProducao: new Date().toISOString().split('T')[0], composicaoId: '', observacoes: '' })
     const [consumoReal, setConsumoReal] = useState<ConsumoPrev[]>([])
     const [qtdRealizada, setQtdRealizada] = useState('')
+    const [editando, setEditando] = useState<Producao | null>(null)
 
     const load = useCallback(async () => {
         setLoading(true)
@@ -61,17 +65,50 @@ export default function ProducaoPage() {
         setSaving(false); setShowModal(false); load()
     }
 
+    // Open edit modal for RASCUNHO production
+    function openEdit(p: Producao) {
+        setEditando(p)
+        setForm({
+            produtoId: p.produtoId || '',
+            codigoLote: p.codigoLote,
+            quantidadePrevista: String(p.quantidadePrevista),
+            dataProducao: new Date(p.dataProducao).toISOString().split('T')[0],
+            composicaoId: '',
+            observacoes: p.observacoes || '',
+        })
+        // Fetch composições for the product
+        if (p.produtoId) {
+            handleProdutoChange(p.produtoId)
+        }
+    }
+
+    async function saveEdit() {
+        if (!editando) return
+        setSaving(true)
+        await fetch(`/api/producao/${editando.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                produtoId: form.produtoId,
+                codigoLote: form.codigoLote,
+                quantidadePrevista: parseFloat(form.quantidadePrevista),
+                dataProducao: form.dataProducao,
+                composicaoId: form.composicaoId || undefined,
+                observacoes: form.observacoes || null,
+            }),
+        })
+        setSaving(false); setEditando(null); load()
+    }
+
+    async function excluirProducao(id: string) {
+        if (!confirm('Excluir esta ordem de produção? Ela será cancelada permanentemente.')) return
+        await fetch(`/api/producao/${id}`, { method: 'DELETE' })
+        load()
+    }
+
     function openConfirm(p: Producao) {
         setConfirmando(p)
         setQtdRealizada(String(p.quantidadePrevista))
-        setConsumoReal(p.consumoInsumos.map(c => ({
-            insumoId: '',
-            insumoNome: c.insumo.nome,
-            unidade: c.insumo.unidadeMedida,
-            quantidadePrevista: Number(c.quantidadePrevista),
-            quantidadeReal: String(c.quantidadeReal ?? c.quantidadePrevista),
-        })))
-        // Find the insumo IDs from the full list
         setConsumoReal(p.consumoInsumos.map(c => {
             const found = insumos.find(i => i.nome === c.insumo.nome)
             return {
@@ -102,6 +139,7 @@ export default function ProducaoPage() {
     }
 
     const produtoSelecionado = produtos.find(p => p.id === form.produtoId)
+    const isEditMode = !!editando
 
     return (
         <div className="page-body anim-fade-in">
@@ -111,7 +149,7 @@ export default function ProducaoPage() {
                     <p className="page-header-sub">Ordens de produção — confirmar dá baixa nos insumos automaticamente</p>
                 </div>
                 <div className="page-actions">
-                    <button className="btn btn-primary" onClick={() => { setForm({ produtoId: '', codigoLote: `LOT-${Date.now().toString().slice(-6)}`, quantidadePrevista: '', dataProducao: new Date().toISOString().split('T')[0], composicaoId: '', observacoes: '' }); setShowModal(true) }} id="btn-nova-producao">
+                    <button className="btn btn-primary" onClick={() => { setEditando(null); setForm({ produtoId: '', codigoLote: `LOT-${Date.now().toString().slice(-6)}`, quantidadePrevista: '', dataProducao: new Date().toISOString().split('T')[0], composicaoId: '', observacoes: '' }); setShowModal(true) }} id="btn-nova-producao">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
                         Nova Produção
                     </button>
@@ -124,7 +162,7 @@ export default function ProducaoPage() {
                         <div className="empty-state"><div className="empty-state-icon">⚗️</div><div className="empty-state-title">Nenhuma produção registrada</div></div>
                     ) : (
                         <table className="table">
-                            <thead><tr><th>Lote</th><th>Produto</th><th>Data</th><th>Qtd. Prev.</th><th>Qtd. Real</th><th>Status</th><th style={{ width: 80 }}>Ações</th></tr></thead>
+                            <thead><tr><th>Lote</th><th>Produto</th><th>Data</th><th>Qtd. Prev.</th><th>Qtd. Real</th><th>Status</th><th style={{ width: 140 }}>Ações</th></tr></thead>
                             <tbody>
                                 {producoes.map((p) => (
                                     <Fragment key={p.id}>
@@ -142,13 +180,12 @@ export default function ProducaoPage() {
                                                     </button>
                                                     {p.status === 'RASCUNHO' && (
                                                         <>
+                                                            <button className="btn-icon" title="Editar" onClick={() => openEdit(p)}>
+                                                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                                                            </button>
                                                             <button className="btn btn-sm btn-primary" style={{ fontSize: 11 }} onClick={() => openConfirm(p)} id={`btn-confirmar-${p.id}`}>Confirmar</button>
-                                                            <button className="btn-icon" title="Cancelar" style={{ color: 'var(--color-danger)' }} onClick={async () => {
-                                                                if (!confirm('Cancelar esta produção?')) return
-                                                                await fetch(`/api/producao/${p.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'CANCELADA' }) })
-                                                                load()
-                                                            }}>
-                                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></svg>
+                                                            <button className="btn-icon" title="Excluir" style={{ color: 'var(--color-danger)' }} onClick={() => excluirProducao(p.id)}>
+                                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /></svg>
                                                             </button>
                                                         </>
                                                     )}
@@ -176,13 +213,13 @@ export default function ProducaoPage() {
                 </div>
             </div>
 
-            {/* Create modal */}
-            {showModal && (
-                <div className="modal-backdrop" onClick={(e) => e.target === e.currentTarget && setShowModal(false)}>
+            {/* Create / Edit modal */}
+            {(showModal || editando) && !confirmando && (
+                <div className="modal-backdrop" onClick={(e) => e.target === e.currentTarget && (isEditMode ? setEditando(null) : setShowModal(false))}>
                     <div className="modal" role="dialog">
                         <div className="modal-header">
-                            <h2 className="modal-title">Nova Ordem de Produção</h2>
-                            <button className="btn-icon" onClick={() => setShowModal(false)}>✕</button>
+                            <h2 className="modal-title">{isEditMode ? '✏️ Editar Produção' : 'Nova Ordem de Produção'}</h2>
+                            <button className="btn-icon" onClick={() => isEditMode ? setEditando(null) : setShowModal(false)}>✕</button>
                         </div>
                         <div className="modal-body">
                             <div className="form-grid form-grid-2" style={{ gap: 'var(--space-4)' }}>
@@ -221,9 +258,9 @@ export default function ProducaoPage() {
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancelar</button>
-                            <button className="btn btn-primary" onClick={save} disabled={saving || !form.produtoId || !form.codigoLote || !form.quantidadePrevista} id="btn-salvar-producao">
-                                {saving ? 'Criando...' : 'Criar Ordem'}
+                            <button className="btn btn-secondary" onClick={() => isEditMode ? setEditando(null) : setShowModal(false)}>Cancelar</button>
+                            <button className="btn btn-primary" onClick={isEditMode ? saveEdit : save} disabled={saving || !form.produtoId || !form.codigoLote || !form.quantidadePrevista} id="btn-salvar-producao">
+                                {saving ? (isEditMode ? 'Salvando...' : 'Criando...') : (isEditMode ? '✅ Salvar Alterações' : 'Criar Ordem')}
                             </button>
                         </div>
                     </div>

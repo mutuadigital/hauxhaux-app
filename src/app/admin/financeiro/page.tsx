@@ -9,6 +9,8 @@ type ContaReceber = {
     dataEmissao: string
     dataVencimento?: string | null
     valorTotal: number
+    valorComissao: number
+    valorRepasse: number
     valorRecebido: number
     saldoAberto: number
     status: string
@@ -55,18 +57,42 @@ export default function FinanceiroPage() {
             <div className="page-header">
                 <div>
                     <h1 className="page-header-title">Contas a Receber</h1>
-                    <p className="page-header-sub">Cobranças geradas pelos fechamentos mensais</p>
+                    <p className="page-header-sub">Cobranças geradas pelos fechamentos mensais e vendas diretas</p>
+                </div>
+            </div>
+
+            {/* Info card explaining the financial logic */}
+            <div className="card" style={{ marginBottom: 'var(--space-4)', padding: 'var(--space-4)', background: 'rgba(197,160,89,0.06)', border: '1px solid rgba(197,160,89,0.18)' }}>
+                <div style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                    <div style={{ flex: 1, minWidth: 280 }}>
+                        <div style={{ fontWeight: 700, fontSize: 'var(--text-sm)', marginBottom: 'var(--space-2)', color: 'var(--color-accent)' }}>ℹ️ Como funciona o cálculo</div>
+                        <div style={{ fontSize: 'var(--text-sm)', lineHeight: 1.7, color: 'var(--color-text-muted)' }}>
+                            <div><strong>Venda Total</strong> — Valor total dos produtos vendidos/consumidos no período</div>
+                            <div><strong>Comissão</strong> — Percentual retido pelo parceiro sobre a venda (ex: 30%)</div>
+                            <div><strong>Valor Repasse</strong> — Valor líquido a ser repassado à HauxHaux <span style={{ opacity: 0.7 }}>(= Venda Total − Comissão)</span></div>
+                            <div><strong>Saldo a Pagar</strong> — Valor que o parceiro ainda deve repassar <span style={{ opacity: 0.7 }}>(= Valor Repasse − Valor Já Recebido)</span></div>
+                        </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+                        <div style={{ padding: 'var(--space-3)', background: 'rgba(0,0,0,0.04)', borderRadius: 'var(--radius)', textAlign: 'center', minWidth: 120 }}>
+                            <div className="text-xs text-muted" style={{ fontWeight: 600, marginBottom: 2 }}>FÓRMULA</div>
+                            <div style={{ fontSize: 'var(--text-xs)', fontFamily: 'monospace', lineHeight: 1.8 }}>
+                                <div>Repasse = Total − Comissão</div>
+                                <div>Saldo = Repasse − Recebido</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             {/* KPIs */}
             <div className="grid grid-2" style={{ gap: 'var(--space-4)', marginBottom: 'var(--space-6)' }}>
                 <div className="kpi-card">
-                    <div className="kpi-label">Total em aberto</div>
+                    <div className="kpi-label">Total em aberto (repasse pendente)</div>
                     <div className="kpi-value" style={{ color: totalAberto > 0 ? 'var(--color-warning)' : 'var(--color-success)' }}>
                         R$ {totalAberto.toFixed(2)}
                     </div>
-                    <div className="kpi-sub">{contas.filter(c => ['EM_ABERTO', 'PARCIAL', 'VENCIDO'].includes(c.status)).length} conta(s)</div>
+                    <div className="kpi-sub">{contas.filter(c => ['EM_ABERTO', 'PARCIAL', 'VENCIDO'].includes(c.status)).length} conta(s) pendente(s)</div>
                 </div>
                 <div className="kpi-card">
                     <div className="kpi-label">Total recebido</div>
@@ -81,7 +107,19 @@ export default function FinanceiroPage() {
                         <div className="empty-state"><div className="empty-state-icon">💰</div><div className="empty-state-title">Nenhuma conta a receber</div></div>
                     ) : (
                         <table className="table">
-                            <thead><tr><th>Parceiro</th><th>Descrição</th><th>Emissão</th><th>Vencimento</th><th>Venda Total</th><th>Repasse (Líquido)</th><th>Saldo a Pagar</th><th>Status</th><th style={{ width: 80 }}>Ações</th></tr></thead>
+                            <thead>
+                                <tr>
+                                    <th>Parceiro</th>
+                                    <th>Descrição</th>
+                                    <th>Emissão</th>
+                                    <th>Vencimento</th>
+                                    <th title="Valor total dos produtos vendidos/consumidos no período">Venda Total ⓘ</th>
+                                    <th title="Valor líquido a repassar à HauxHaux (Total − Comissão do parceiro)">Repasse (Líquido) ⓘ</th>
+                                    <th title="Valor restante que o parceiro ainda deve repassar (Repasse − Já Recebido)">Saldo a Pagar ⓘ</th>
+                                    <th>Status</th>
+                                    <th style={{ width: 80 }}>Ações</th>
+                                </tr>
+                            </thead>
                             <tbody>
                                 {contas.map((c) => (
                                     <>
@@ -91,7 +129,7 @@ export default function FinanceiroPage() {
                                             <td className="text-sm">{new Date(c.dataEmissao).toLocaleDateString('pt-BR')}</td>
                                             <td className="text-sm">{c.dataVencimento ? new Date(c.dataVencimento).toLocaleDateString('pt-BR') : <span className="text-muted">—</span>}</td>
                                             <td className="font-medium">R$ {Number(c.valorTotal).toFixed(2)}</td>
-                                            <td className="font-medium" style={{ color: 'var(--color-info)' }}>R$ {Number((c as any).valorRepasse || c.valorTotal).toFixed(2)}</td>
+                                            <td className="font-medium" style={{ color: 'var(--color-info)' }}>R$ {Number(c.valorRepasse || c.valorTotal).toFixed(2)}</td>
                                             <td className="font-medium" style={{ color: Number(c.saldoAberto) > 0 ? 'var(--color-danger)' : 'var(--color-success)' }}>
                                                 R$ {Number(c.saldoAberto).toFixed(2)}
                                             </td>
@@ -108,7 +146,7 @@ export default function FinanceiroPage() {
                                         </tr>
                                         {expandedId === c.id && c.recebimentos.length > 0 && (
                                             <tr key={`${c.id}-rec`}>
-                                                <td colSpan={8} style={{ padding: 0, background: 'rgba(0,0,0,0.02)' }}>
+                                                <td colSpan={9} style={{ padding: 0, background: 'rgba(0,0,0,0.02)' }}>
                                                     <table className="table" style={{ margin: 0 }}>
                                                         <thead><tr><th style={{ paddingLeft: 48 }}>Data recebimento</th><th>Valor</th><th>Forma</th></tr></thead>
                                                         <tbody>

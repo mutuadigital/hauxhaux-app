@@ -20,6 +20,7 @@ const navItems: { section: string; items: NavItem[] }[] = [
             { href: '/admin/insumos', label: 'Insumos', icon: '🌿' },
             { href: '/admin/categorias', label: 'Categorias', icon: '🏷️' },
             { href: '/admin/parceiros', label: 'Parceiros', icon: '🤝' },
+            { href: '/admin/clientes', label: 'Clientes', icon: '👥' },
             { href: '/admin/usuarios', label: 'Usuários', icon: '👤' },
         ],
     },
