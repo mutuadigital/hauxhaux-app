@@ -28,7 +28,10 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         const conta = await tx.contaReceber.findUnique({ where: { id } })
         if (conta) {
             const novoRecebido = Number(conta.valorRecebido) + Number(valorRecebido)
-            const novoSaldo = Number(conta.valorTotal) - novoRecebido
+            // O saldo em aberto é baseado no valorRepasse (líquido), pois a comissão
+            // do parceiro não compõe o repasse devido à HauxHaux.
+            const valorBase = Number(conta.valorRepasse)
+            const novoSaldo = valorBase - novoRecebido
             await tx.contaReceber.update({
                 where: { id },
                 data: {
