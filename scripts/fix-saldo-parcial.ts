@@ -4,7 +4,7 @@
  *
  * Executar com: npx tsx scripts/fix-saldo-parcial.ts
  */
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, StatusConta } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -24,13 +24,13 @@ async function main() {
         const valorRecebido = Number(conta.valorRecebido)
         const saldoCorreto = valorRepasse - valorRecebido
 
-        let novoStatus: string
+        let novoStatus: StatusConta
         if (saldoCorreto <= 0) {
-            novoStatus = 'RECEBIDO'
+            novoStatus = StatusConta.RECEBIDO
         } else if (valorRecebido > 0) {
-            novoStatus = 'PARCIAL'
+            novoStatus = StatusConta.PARCIAL
         } else {
-            novoStatus = 'EM_ABERTO'
+            novoStatus = StatusConta.EM_ABERTO
         }
 
         if (novoStatus !== conta.status || Math.abs(saldoCorreto - Number(conta.saldoAberto)) > 0.001) {
