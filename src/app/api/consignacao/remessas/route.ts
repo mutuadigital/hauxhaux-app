@@ -13,7 +13,7 @@ export async function GET(req: Request) {
             parceiro: { select: { nome: true } },
             itens: { include: { produto: { select: { nome: true, unidadeMedida: true } } } },
         },
-        take: 100,
+        take: 200,
     })
     return NextResponse.json(remessas)
 }
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
             data: {
                 parceiroId,
                 dataEnvio: new Date(dataEnvio),
-                status: 'CONFIRMADA',
+                status: 'EM_SEPARACAO',
                 observacoes: observacoes || null,
                 criadoPor: session.user?.id ?? null,
                 itens: {

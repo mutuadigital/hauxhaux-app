@@ -23,7 +23,7 @@ export async function GET() {
         const lastItem = await prisma.remessaConsignacaoItem.findFirst({
             where: {
                 produtoId: e.produtoId,
-                remessa: { parceiroId, status: 'CONFIRMADA' },
+                remessa: { parceiroId, status: { in: ['EM_SEPARACAO', 'ENVIADA'] } },
                 valorReferencia: { not: null },
             },
             orderBy: { remessa: { dataEnvio: 'desc' } },

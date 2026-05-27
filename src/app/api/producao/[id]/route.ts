@@ -86,7 +86,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     return NextResponse.json(updated)
 }
 
-// DELETE: Logical deletion (set status to CANCELADA) - only RASCUNHO can be deleted
+// DELETE: Remove production and reverse stock movements for any status
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
     const session = await auth()
     if (!session || (session.user as { role: string }).role !== 'ADMIN')
@@ -94,15 +94,62 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 
     const { id } = await params
 
-    const producao = await prisma.producao.findUnique({ where: { id } })
-    if (!producao) return NextResponse.json({ error: 'Não encontrado' }, { status: 404 })
-    if (producao.status !== 'RASCUNHO')
-        return NextResponse.json({ error: 'Apenas produções em rascunho podem ser excluídas' }, { status: 400 })
-
-    // Logical deletion: change status to CANCELADA
-    await prisma.producao.update({
+    const producao = await prisma.producao.findUnique({
         where: { id },
-        data: { status: 'CANCELADA' },
+        include: { consumoInsumos: true },
+    })
+    if (!producao) return NextResponse.json({ error: 'Não encontrado' }, { status: 404 })
+
+    await prisma.$transaction(async (tx) => {
+        // If CONFIRMADA: reverse all stock movements
+        if (producao.status === 'CONFIRMADA') {
+            const qtdRealizada = Number(producao.quantidadeRealizada ?? 0)
+
+            // Remove the produced quantity from produto stock
+            if (qtdRealizada > 0) {
+                await tx.estoqueProduto.update({
+                    where: { produtoId: producao.produtoId },
+                    data: { quantidadeAtual: { decrement: qtdRealizada } },
+                })
+                await tx.movimentoEstoqueProduto.create({
+                    data: {
+                        produtoId: producao.produtoId,
+                        tipoMovimento: 'AJUSTE_SAIDA',
+                        origemTipo: 'PRODUCAO_EXCLUIDA',
+                        origemId: id,
+                        quantidade: qtdRealizada,
+                        sinal: 'SAIDA',
+                        criadoPor: session.user?.id ?? null,
+                    },
+                })
+            }
+
+            // Return each insumo to stock
+            for (const consumo of producao.consumoInsumos) {
+                const qtdReal = Number(consumo.quantidadeReal ?? consumo.quantidadePrevista)
+                if (qtdReal > 0) {
+                    await tx.estoqueInsumo.update({
+                        where: { insumoId: consumo.insumoId },
+                        data: { quantidadeAtual: { increment: qtdReal } },
+                    })
+                    await tx.movimentoEstoqueInsumo.create({
+                        data: {
+                            insumoId: consumo.insumoId,
+                            tipoMovimento: 'AJUSTE_ENTRADA',
+                            origemTipo: 'PRODUCAO_EXCLUIDA',
+                            origemId: id,
+                            quantidade: qtdReal,
+                            sinal: 'ENTRADA',
+                            criadoPor: session.user?.id ?? null,
+                        },
+                    })
+                }
+            }
+        }
+
+        // Delete consumo records then the production (cascade would also work)
+        await tx.producaoConsumoInsumo.deleteMany({ where: { producaoId: id } })
+        await tx.producao.delete({ where: { id } })
     })
 
     return NextResponse.json({ ok: true })

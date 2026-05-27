@@ -148,7 +148,7 @@ export default async function ParceiroPainelPage({ params }: { params: Promise<{
                                                 <td className="text-xs text-muted">
                                                     {r.itens.map(i => i.produto.nome).join(', ')}
                                                 </td>
-                                                <td><span className={`badge ${r.status === 'CONFIRMADA' ? 'badge-success' : r.status === 'CANCELADA' ? 'badge-danger' : 'badge-warning'}`}>{r.status}</span></td>
+                                                <td><span className={`badge ${r.status === 'ENVIADA' ? 'badge-success' : r.status === 'EM_SEPARACAO' ? 'badge-warning' : r.status === 'CANCELADA' ? 'badge-danger' : 'badge-neutral'}`}>{r.status === 'EM_SEPARACAO' ? 'Em Separação' : r.status === 'ENVIADA' ? 'Enviada' : r.status}</span></td>
                                             </tr>
                                         ))}
                                     </tbody>

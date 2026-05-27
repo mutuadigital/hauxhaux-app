@@ -31,7 +31,7 @@ export async function POST(req: Request) {
             data: {
                 parceiroId,
                 dataDevolucao: new Date(dataDevolucao),
-                status: 'CONFIRMADA',
+                status: 'ENVIADA',
                 observacoes: observacoes || null,
                 criadoPor: session.user?.id ?? null,
                 itens: {

@@ -416,7 +416,7 @@ model RemessaConsignacao {
   id           String        @id @default(cuid())
   parceiroId   String
   dataEnvio    DateTime
-  status       StatusRemessa @default(RASCUNHO)
+  status       StatusRemessa @default(EM_SEPARACAO)
   observacoes  String?
   criadoPor    String?
   criadoEm     DateTime      @default(now())
@@ -431,7 +431,8 @@ model RemessaConsignacao {
 
 enum StatusRemessa {
   RASCUNHO
-  CONFIRMADA
+  EM_SEPARACAO
+  ENVIADA
   CANCELADA
 }
 
